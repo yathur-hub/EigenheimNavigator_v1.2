@@ -38,9 +38,14 @@ const Header: React.FC<HeaderProps> = ({ onStartCheck }) => {
           </button>
         </div>
 
-        {/* Mobile Menu Icon (Reduced as nav is empty) */}
-        <div className="md:hidden text-slate-900 cursor-pointer" onClick={onStartCheck}>
-           <button className="bg-[#2663EB] text-white px-4 py-2 rounded-lg text-xs font-bold">Check</button>
+        {/* Mobile Menu Icon (Improved prominence) */}
+        <div className="md:hidden">
+           <button 
+            onClick={onStartCheck}
+            className="bg-[#2663EB] text-white px-5 py-2 rounded-xl text-xs font-extrabold shadow-md active:scale-95 transition-all"
+           >
+             Check starten
+           </button>
         </div>
       </div>
     </header>

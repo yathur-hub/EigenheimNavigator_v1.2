@@ -11,7 +11,6 @@ import PartnerSection from './components/PartnerSection';
 import FAQSection from './components/FAQSection';
 import ContactSection from './components/ContactSection';
 import Footer from './components/Footer';
-import StickyMobileCTA from './components/StickyMobileCTA';
 
 type ModalStep = 'step1' | 'result' | 'step2' | 'leadCapture';
 
@@ -149,7 +148,6 @@ const App: React.FC = () => {
       </main>
 
       <Footer />
-      <StickyMobileCTA onStartCheck={openModal} />
 
       {/* REALITÄTSCHECK MODAL (Variante A) */}
       {isModalOpen && (
