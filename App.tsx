@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import Header from './components/Header';
 import Hero from './components/Hero';
 import LogoSlider from './components/LogoSlider';
@@ -17,7 +17,6 @@ type ModalStep = 'step1' | 'result' | 'step2' | 'leadCapture';
 const App: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalView, setModalView] = useState<ModalStep>('step1');
-  const [hasStartedStep1, setHasStartedStep1] = useState(false);
   const [isStep2Active, setIsStep2Active] = useState(false);
   
   const [formData, setFormData] = useState({
@@ -28,8 +27,11 @@ const App: React.FC = () => {
     price_band: '',
     employment_type: '',
     equity_source: [] as string[],
+    firstname: '',
+    lastname: '',
     email: '',
-    phone: ''
+    phone: '',
+    message: ''
   });
 
   const track = (event: string, data?: any) => {
@@ -38,10 +40,23 @@ const App: React.FC = () => {
 
   const openModal = () => {
     track('check_modal_open');
+    setFormData({
+      timeframe: '',
+      region: '',
+      income_band: '',
+      equity_band: '',
+      price_band: '',
+      employment_type: '',
+      equity_source: [],
+      firstname: '',
+      lastname: '',
+      email: '',
+      phone: '',
+      message: ''
+    });
     setIsModalOpen(true);
     setModalView('step1');
     setIsStep2Active(false);
-    setHasStartedStep1(false);
     document.body.style.overflow = 'hidden';
   };
 
@@ -51,31 +66,10 @@ const App: React.FC = () => {
     document.body.style.overflow = 'unset';
   };
 
-  const handleInteraction = () => {
-    if (!hasStartedStep1) {
-      track('check_step1_start');
-      setHasStartedStep1(true);
-    }
-  };
-
   const handleStep1Submit = (e: React.FormEvent) => {
     e.preventDefault();
     track('check_step1_submit');
-    setModalView('result');
-    track('check_result_view', { step: 1, data: formData });
-  };
-
-  const startStep2 = () => {
-    track('check_step2_start');
     setModalView('step2');
-  };
-
-  const handleStep2Submit = (e: React.FormEvent) => {
-    e.preventDefault();
-    track('check_step2_submit');
-    setIsStep2Active(true);
-    setModalView('result');
-    track('check_result_view', { step: 2, data: formData });
   };
 
   const toggleEquitySource = (val: string) => {
@@ -88,48 +82,37 @@ const App: React.FC = () => {
   };
 
   const getResultContent = () => {
-    // Basic logic for dynamic content based on input
     const isHighIncome = formData.income_band.includes('200') || formData.income_band.includes('300');
     const isHighEquity = formData.equity_band.includes('200') || formData.equity_band.includes('400');
-    const isLowStats = formData.income_band.includes('unter') || formData.equity_band.includes('unter') || formData.equity_band.includes('unklar');
+    const isLowStats = formData.income_band.includes('unter') || formData.equity_band.includes('unter');
 
-    let headline = "Erste Einordnung: Potenzial mit Hebeln";
-    let insight = "Region und Timing beeinflussen die Realisierbarkeit stärker, als viele erwarten.";
+    let status: 'positive' | 'neutral' | 'challenging' = 'neutral';
+    let headline = "Erste Einordnung: Potenzial vorhanden";
+    let insight = "Ihre Angaben zeigen, dass eine Finanzierung mit der richtigen Strategie realistisch ist.";
 
     if (isHighIncome && isHighEquity) {
-      headline = "Erste Einordnung: gute Ausgangslage";
-      insight = "Der grösste Hebel liegt oft im Zusammenspiel von Eigenmitteln und Preisband.";
+      status = 'positive';
+      headline = "Optimale Ausgangslage";
+      insight = "Ihre finanzielle Basis ist überdurchschnittlich. Wir können direkt in die Objektsuche und Zinsoptimierung gehen.";
     } else if (isLowStats) {
-      headline = "Erste Einordnung: aktuell eher schwierig – aber planbar";
-      insight = "Wenn Eigenmittel noch im Aufbau sind, lohnt sich eine klare Etappierung.";
+      status = 'challenging';
+      headline = "Herausfordernd, aber machbar";
+      insight = "Aktuell liegt der Fokus auf dem Aufbau von Eigenmitteln oder der Optimierung der Tragbarkeit.";
     }
 
-    if (isStep2Active) {
-      if (formData.employment_type === 'selbstständig') {
-        insight = "Bei selbstständigem Einkommen lohnt sich eine frühe Strukturierung für Banken.";
-      } else if (formData.equity_source.includes('Pensionskasse (2. Säule)')) {
-        insight = "Wenn ein Teil der Eigenmittel aus Vorsorge kommt, ist die Planung der Bezüge zentral.";
-      } else if (formData.price_band.includes('2.0') || formData.price_band.includes('1.5')) {
-        insight = "Bei Ihrem Preisband wird die Eigenmittelstrategie meist zum entscheidenden Hebel.";
-      }
-    }
-
-    return { headline, insight };
+    return { headline, insight, status };
   };
 
-  const { headline, insight } = getResultContent();
+  const { headline, insight, status } = getResultContent();
 
   const isStep1Valid = formData.timeframe && formData.region && formData.income_band && formData.equity_band;
-  const isStep2Valid = (formData.price_band ? 1 : 0) + (formData.employment_type ? 1 : 0) + (formData.equity_source.length > 0 ? 1 : 0) >= 2;
 
-  // Close on ESC
-  useEffect(() => {
-    const handleEsc = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') closeModal();
-    };
-    window.addEventListener('keydown', handleEsc);
-    return () => window.removeEventListener('keydown', handleEsc);
-  }, []);
+  // Icons Helper
+  const IconCheck = () => (
+    <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" />
+    </svg>
+  );
 
   return (
     <div className="relative min-h-screen flex flex-col bg-white font-['Inter']">
@@ -138,9 +121,9 @@ const App: React.FC = () => {
       <main className="flex-grow">
         <Hero onStartCheck={openModal} />
         <LogoSlider />
+        <SocialProofSection onStartCheck={openModal} />
         <RealitySection onStartCheck={openModal} />
         <SolutionSection onStartCheck={openModal} />
-        <SocialProofSection onStartCheck={openModal} />
         <ProcessSection />
         <PartnerSection onStartCheck={openModal} />
         <FAQSection />
@@ -148,271 +131,233 @@ const App: React.FC = () => {
       </main>
 
       <Footer />
-
-      {/* REALITÄTSCHECK MODAL (Variante A) */}
+      
+      {/* OPTIMIZED REALITÄTSCHECK MODAL */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center p-0 sm:p-6 animate-fade-in">
-          {/* Backdrop */}
-          <div 
-            className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity"
-            onClick={closeModal}
-          ></div>
+        <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center p-0 sm:p-4 md:p-6 animate-fade-in">
+          <div className="absolute inset-0 bg-slate-900/80 backdrop-blur-md" onClick={closeModal}></div>
           
-          {/* Modal Container */}
-          <div className="relative w-full max-w-xl bg-white rounded-t-[24px] sm:rounded-[24px] shadow-2xl overflow-hidden flex flex-col max-h-[95vh] sm:max-h-none">
+          <div className="relative w-full max-w-2xl bg-white rounded-t-[32px] sm:rounded-[32px] shadow-2xl overflow-hidden flex flex-col h-[92vh] sm:h-auto max-h-[92vh]">
             
             {/* Modal Header */}
-            <div className="px-6 py-6 border-b border-slate-100 flex items-center justify-between flex-shrink-0">
-              <div>
-                <h2 className="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight">Realitätscheck (90 Sekunden)</h2>
-                <p className="text-slate-500 text-xs mt-1">Erste Einordnung zu Budget, Finanzierung und Kaufzeitpunkt.</p>
+            <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between bg-white sticky top-0 z-10">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-xs shadow-lg">CH</div>
+                <div>
+                  <h2 className="text-lg font-extrabold text-slate-900 leading-none">Realitätscheck</h2>
+                  <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">Schweizer Marktstandard</p>
+                </div>
               </div>
-              <button 
-                onClick={closeModal}
-                className="p-2 text-slate-400 hover:text-slate-600 transition-colors"
-                aria-label="Schliessen"
-              >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
+              <button onClick={closeModal} className="p-2 bg-slate-50 rounded-full text-slate-400 hover:text-slate-600 transition-colors">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" /></svg>
               </button>
             </div>
 
             {/* Scrollable Content */}
-            <div className="flex-grow overflow-y-auto no-scrollbar p-6 sm:p-8 space-y-8">
+            <div className="flex-grow overflow-y-auto no-scrollbar px-4 py-6 sm:px-10 sm:py-8 space-y-6 sm:space-y-8">
               
-              {/* Progress & Erwartungssteuerung */}
-              <div className="flex items-center justify-between gap-4">
-                <div className="flex-grow">
-                   <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
-                      <div 
-                        className="h-full bg-[#2663EB] transition-all duration-500" 
-                        style={{ width: modalView === 'step1' ? '25%' : (modalView === 'step2' ? '75%' : '100%') }}
-                      ></div>
-                   </div>
-                   <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-2">
-                     {modalView === 'step1' ? 'Stufe 1 von 2 (Vertiefung optional)' : (modalView === 'step2' ? 'Stufe 2 von 2 (Vertiefung)' : 'Einordnung bereit')}
-                   </p>
+              {/* Progress Bar */}
+              <div className="flex items-center gap-4">
+                <div className="flex-grow h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                  <div 
+                    className="h-full bg-blue-600 transition-all duration-700 ease-out" 
+                    style={{ 
+                      width: 
+                        modalView === 'step1' ? '25%' : 
+                        modalView === 'step2' ? '50%' : 
+                        modalView === 'result' ? '75%' : '100%' 
+                    }}
+                  ></div>
                 </div>
-                <div className="text-right hidden sm:block">
-                  <p className="text-[10px] text-slate-400 font-medium">Dauer: ca. 90s · Keine Zusage</p>
-                </div>
+                <span className="text-[10px] font-black text-blue-600 uppercase tabular-nums">
+                  {modalView === 'step1' ? 'Schritt 1/4' : 
+                   modalView === 'step2' ? 'Schritt 2/4' : 
+                   modalView === 'result' ? 'Schritt 3/4' : 'Schritt 4/4'}
+                </span>
               </div>
 
-              {/* STEP 1 */}
+              {/* STEP 1: Interactive Cards instead of Selects */}
               {modalView === 'step1' && (
-                <form onSubmit={handleStep1Submit} className="space-y-6">
-                  <p className="text-sm text-slate-600">Beantworten Sie 4 kurze Fragen – Sie erhalten sofort eine erste Einordnung.</p>
-                  
-                  <div className="grid grid-cols-1 gap-5">
-                    {/* Q1: timeframe */}
-                    <div className="space-y-2">
-                      <label className="text-xs font-bold text-slate-700 uppercase tracking-wider">1. Wann möchten Sie kaufen?</label>
-                      <select 
-                        className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl p-3.5 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none transition-all"
-                        value={formData.timeframe}
-                        onFocus={handleInteraction}
-                        onChange={(e) => setFormData({...formData, timeframe: e.target.value})}
-                      >
-                        <option value="">Bitte wählen...</option>
-                        <option value="innerhalb 6 Monate">innerhalb 6 Monate</option>
-                        <option value="6–12 Monate">6–12 Monate</option>
-                        <option value="1–3 Jahre">1–3 Jahre</option>
-                        <option value="unklar / ich prüfe erst">unklar / ich prüfe erst</option>
-                      </select>
+                <div className="space-y-8 sm:space-y-10">
+                  <div className="space-y-2">
+                    <h3 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight leading-tight">Erzählen Sie uns von Ihrem Vorhaben.</h3>
+                    <p className="text-slate-500 text-xs sm:text-sm">4 kurze Angaben für Ihre erste ehrliche Einordnung.</p>
+                  </div>
+
+                  <div className="space-y-6 sm:space-y-8">
+                    {/* Q1: Timeframe */}
+                    <div className="space-y-3 sm:space-y-4">
+                      <label className="text-[10px] sm:text-xs font-black text-slate-900 uppercase tracking-widest">Wann möchten Sie einziehen?</label>
+                      <div className="grid grid-cols-2 gap-2 sm:gap-3">
+                        {['Sofort', '6–12 Monate', '1–3 Jahre', 'Unklar'].map(opt => (
+                          <button
+                            key={opt}
+                            onClick={() => setFormData({...formData, timeframe: opt})}
+                            className={`p-3 sm:p-4 rounded-xl sm:rounded-2xl border-2 text-left transition-all ${
+                              formData.timeframe === opt 
+                              ? 'border-blue-600 bg-blue-50/50 shadow-md ring-1 ring-blue-600' 
+                              : 'border-slate-100 bg-white hover:border-slate-300'
+                            }`}
+                          >
+                            <span className={`block text-xs sm:text-sm font-bold ${formData.timeframe === opt ? 'text-blue-700' : 'text-slate-700'}`}>{opt}</span>
+                          </button>
+                        ))}
+                      </div>
                     </div>
 
-                    {/* Q2: region (AKTUALISIERT) */}
-                    <div className="space-y-2">
-                      <label className="text-xs font-bold text-slate-700 uppercase tracking-wider">2. Welche Region ist für Sie aktuell am relevantesten?</label>
-                      <select 
-                        className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl p-3.5 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none transition-all"
-                        value={formData.region}
-                        onFocus={handleInteraction}
-                        onChange={(e) => setFormData({...formData, region: e.target.value})}
-                      >
-                        <option value="">Bitte wählen...</option>
-                        <option value="St. Gallen">St. Gallen</option>
-                        <option value="Schaffhausen">Schaffhausen</option>
-                        <option value="Appenzell Innerrhoden">Appenzell Innerrhoden</option>
-                        <option value="Appenzell Ausserrhoden">Appenzell Ausserrhoden</option>
-                        <option value="Graubünden">Graubünden</option>
-                        <option value="Solothurn">Solothurn</option>
-                        <option value="Thurgau">Thurgau</option>
-                        <option value="Andere Region">Andere Region</option>
-                        <option value="Noch offen / flexibel">Noch offen / flexibel</option>
-                      </select>
-                      <p className="text-[10px] text-slate-400">Die Region beeinflusst Finanzierung, Preisband and Möglichkeiten.</p>
+                    {/* Q2: Region Cards */}
+                    <div className="space-y-3 sm:space-y-4">
+                      <label className="text-[10px] sm:text-xs font-black text-slate-900 uppercase tracking-widest">In welcher Region suchen Sie?</label>
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3">
+                        {['St. Gallen', 'Schaffhausen', 'Thurgau', 'Graubünden', 'Solothurn', 'Anderes'].map(reg => (
+                          <button
+                            key={reg}
+                            onClick={() => setFormData({...formData, region: reg})}
+                            className={`p-2.5 sm:p-3 rounded-lg sm:rounded-xl border-2 text-center transition-all ${
+                              formData.region === reg 
+                              ? 'border-blue-600 bg-blue-50/50' 
+                              : 'border-slate-100 bg-white hover:border-slate-300'
+                            }`}
+                          >
+                            <span className="text-[10px] sm:text-xs font-bold text-slate-700">{reg}</span>
+                          </button>
+                        ))}
+                      </div>
                     </div>
 
-                    {/* Q3: income_band */}
-                    <div className="space-y-2">
-                      <label className="text-xs font-bold text-slate-700 uppercase tracking-wider">3. Haushalts-Bruttoeinkommen pro Jahr</label>
-                      <select 
-                        className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl p-3.5 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none transition-all"
-                        value={formData.income_band}
-                        onFocus={handleInteraction}
-                        onChange={(e) => setFormData({...formData, income_band: e.target.value})}
-                      >
-                        <option value="">Bitte wählen...</option>
-                        <option value="unter CHF 100’000">unter CHF 100’000</option>
-                        <option value="CHF 100’000 – 150’000">CHF 100’000 – 150’000</option>
-                        <option value="CHF 150’000 – 200’000">CHF 150’000 – 200’000</option>
-                        <option value="CHF 200’000 – 300’000">CHF 200’000 – 300’000</option>
-                        <option value="über CHF 300’000">über CHF 300’000</option>
-                        <option value="möchte ich nicht angeben">möchte ich nicht angeben</option>
-                      </select>
-                      <p className="text-[10px] text-slate-400">Damit wir die Tragbarkeit grob einordnen können.</p>
-                    </div>
-
-                    {/* Q4: equity_band */}
-                    <div className="space-y-2">
-                      <label className="text-xs font-bold text-slate-700 uppercase tracking-wider">4. Eigenmittel, die heute verfügbar sind</label>
-                      <select 
-                        className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl p-3.5 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none transition-all"
-                        value={formData.equity_band}
-                        onFocus={handleInteraction}
-                        onChange={(e) => setFormData({...formData, equity_band: e.target.value})}
-                      >
-                        <option value="">Bitte wählen...</option>
-                        <option value="unter CHF 50’000">unter CHF 50’000</option>
-                        <option value="CHF 50’000 – 100’000">CHF 50’000 – 100’000</option>
-                        <option value="CHF 100’000 – 200’000">CHF 100’000 – 200’000</option>
-                        <option value="CHF 200’000 – 400’000">CHF 200’000 – 400’000</option>
-                        <option value="über CHF 400’000">über CHF 400’000</option>
-                        <option value="unklar / muss ich prüfen">unklar / muss ich prüfen</option>
-                      </select>
-                      <p className="text-[10px] text-slate-400">Eigenmittel bestimmen Ihren Handlungsspielraum.</p>
+                    {/* Q3 & Q4: Quick Selections for Income/Equity */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+                      <div className="space-y-3 sm:space-y-4">
+                        <label className="text-[10px] sm:text-xs font-black text-slate-900 uppercase tracking-widest">Jahreseinkommen (CHF)</label>
+                        <select 
+                          className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl p-3 sm:p-4 text-xs sm:text-sm font-bold focus:border-blue-600 outline-none appearance-none"
+                          value={formData.income_band}
+                          onChange={(e) => setFormData({...formData, income_band: e.target.value})}
+                        >
+                          <option value="">Bitte wählen...</option>
+                          <option value="unter CHF 100k">unter CHF 100’000</option>
+                          <option value="100k–150k">CHF 100k – 150k</option>
+                          <option value="150k–200k">CHF 150k – 200k</option>
+                          <option value="über 200k">über CHF 200k</option>
+                        </select>
+                      </div>
+                      <div className="space-y-3 sm:space-y-4">
+                        <label className="text-[10px] sm:text-xs font-black text-slate-900 uppercase tracking-widest">Eigenmittel (CHF)</label>
+                        <select 
+                          className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl p-3 sm:p-4 text-xs sm:text-sm font-bold focus:border-blue-600 outline-none appearance-none"
+                          value={formData.equity_band}
+                          onChange={(e) => setFormData({...formData, equity_band: e.target.value})}
+                        >
+                          <option value="">Bitte wählen...</option>
+                          <option value="unter CHF 50k">unter CHF 50’000</option>
+                          <option value="50k–100k">CHF 50k – 100k</option>
+                          <option value="100k–200k">CHF 100k – 200k</option>
+                          <option value="über 200k">über CHF 200k</option>
+                        </select>
+                      </div>
                     </div>
                   </div>
 
-                  <button 
-                    type="submit"
-                    disabled={!isStep1Valid}
-                    className="w-full bg-[#2663EB] text-white py-4 rounded-xl font-bold text-lg shadow-lg hover:bg-blue-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    Einordnung anzeigen
-                  </button>
-                </form>
+                  <div className="pt-4 sm:pt-6 border-t border-slate-50">
+                    <button 
+                      onClick={handleStep1Submit}
+                      disabled={!isStep1Valid}
+                      className="w-full bg-blue-600 text-white py-4 sm:py-5 rounded-xl sm:rounded-[20px] font-black text-base sm:text-lg shadow-xl shadow-blue-200 hover:bg-blue-700 transition-all disabled:opacity-40 disabled:shadow-none"
+                    >
+                      Jetzt Einordnung anzeigen
+                    </button>
+                    <p className="text-center text-[10px] text-slate-400 mt-4 uppercase font-bold tracking-widest">Privat & Sicher · Keine Bank-Auskunft</p>
+                  </div>
+                </div>
               )}
 
-              {/* RESULT PANEL */}
+              {/* RESULT VIEW: Optimized with Status Indicator */}
               {modalView === 'result' && (
-                <div className="animate-fade-in space-y-8">
-                  <div className="bg-slate-50 p-6 rounded-2xl border border-slate-100 relative overflow-hidden">
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/5 rounded-full -mr-16 -mt-16"></div>
-                    <h3 className="text-xl font-extrabold text-slate-900 mb-2">{headline}</h3>
-                    <p className="text-[#2663EB] font-bold text-sm leading-relaxed">{insight}</p>
-                    
-                    <div className="mt-6 pt-6 border-t border-slate-200">
-                      <p className="text-slate-600 text-sm leading-relaxed">
-                        Wenn Sie möchten, validieren wir diese Einordnung in einem kurzen Gespräch. Sie erhalten klare nächste Schritte – ohne Verpflichtung.
-                      </p>
+                <div className="animate-fade-in space-y-8 sm:space-y-10 py-2 sm:py-4">
+                  <div className="text-center space-y-3 sm:space-y-4">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-[10px] font-black uppercase tracking-widest">Analyse Abgeschlossen</div>
+                    <h3 className="text-2xl sm:text-3xl font-black text-slate-900 leading-tight">{headline}</h3>
+                  </div>
+
+                  {/* Status Box */}
+                  <div className={`p-6 sm:p-8 rounded-2xl sm:rounded-[32px] border-2 relative overflow-hidden ${
+                    status === 'positive' ? 'border-emerald-100 bg-emerald-50/30' : 
+                    status === 'challenging' ? 'border-orange-100 bg-orange-50/30' : 'border-blue-100 bg-blue-50/30'
+                  }`}>
+                    <div className="flex items-start gap-4 sm:gap-6">
+                       <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg ${
+                         status === 'positive' ? 'bg-emerald-500 text-white' : 
+                         status === 'challenging' ? 'bg-orange-500 text-white' : 'bg-blue-600 text-white'
+                       }`}>
+                         {status === 'positive' ? (
+                           <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" /></svg>
+                         ) : status === 'challenging' ? (
+                           <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" /></svg>
+                         ) : (
+                           <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" /></svg>
+                         )}
+                       </div>
+                       <p className="text-slate-800 font-bold text-base sm:text-lg leading-snug">{insight}</p>
                     </div>
                   </div>
 
-                  <div className="space-y-4">
+                  <div className="space-y-3 sm:space-y-4 pt-2 sm:pt-4">
                     <button 
-                      onClick={() => {
-                        track('check_result_cta_primary_click');
-                        closeModal();
-                        document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' });
-                      }}
-                      className="w-full bg-[#2663EB] text-white py-4 rounded-xl font-bold text-lg shadow-lg hover:bg-blue-700 transition-all"
+                      onClick={() => setModalView('leadCapture')}
+                      className="w-full bg-slate-900 text-white py-4 sm:py-5 rounded-xl sm:rounded-[20px] font-black text-base sm:text-lg shadow-xl hover:bg-black transition-all"
                     >
-                      Kurz validieren lassen (15 Min)
+                      Kostenlose Kurzberatung (15 Min.)
                     </button>
-                    
-                    <div className="space-y-4">
-                      {/* Option «Ergebnis per E-Mail sichern» wurde entfernt. Nur «Vertiefen» wird angezeigt, wenn Step 2 noch nicht aktiv ist. */}
-                      {!isStep2Active && (
-                        <button 
-                          onClick={startStep2}
-                          className="w-full border-2 border-[#F87101] text-[#F87101] py-4 rounded-xl font-bold text-lg hover:bg-orange-50 transition-all"
-                        >
-                          Vertiefen (60 Sekunden)
-                        </button>
-                      )}
-                    </div>
                   </div>
                   
                   <button 
-                    onClick={() => {
-                      setModalView('step1');
-                      setIsStep2Active(false);
-                    }}
-                    className="w-full text-slate-400 text-[10px] font-bold uppercase tracking-widest hover:text-slate-600"
+                    onClick={() => setModalView('step2')}
+                    className="w-full text-slate-400 text-[10px] font-black uppercase tracking-[0.2em] hover:text-slate-600 transition-colors"
                   >
-                    &larr; Antworten bearbeiten
+                    Daten korrigieren
                   </button>
                 </div>
               )}
 
-              {/* STEP 2 */}
+              {/* STEP 2: Vertiefung */}
               {modalView === 'step2' && (
-                <form onSubmit={handleStep2Submit} className="animate-fade-in space-y-6">
-                  <div className="grid grid-cols-1 gap-5">
-                    {/* Q5: price_band */}
-                    <div className="space-y-2">
-                      <label className="text-xs font-bold text-slate-700 uppercase tracking-wider">5. Zielpreisband (Kaufpreis)</label>
-                      <select 
-                        className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl p-3.5 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none transition-all"
-                        value={formData.price_band}
-                        onChange={(e) => setFormData({...formData, price_band: e.target.value})}
-                      >
-                        <option value="">Bitte wählen...</option>
-                        <option value="unter CHF 700’000">unter CHF 700’000</option>
-                        <option value="CHF 700’000 – 1.0 Mio.">CHF 700’000 – 1.0 Mio.</option>
-                        <option value="CHF 1.0 – 1.5 Mio.">CHF 1.0 – 1.5 Mio.</option>
-                        <option value="CHF 1.5 – 2.0 Mio.">CHF 1.5 – 2.0 Mio.</option>
-                        <option value="über CHF 2.0 Mio.">über CHF 2.0 Mio.</option>
-                        <option value="noch offen">noch offen</option>
-                      </select>
-                    </div>
+                <div className="animate-fade-in space-y-8 sm:space-y-10">
+                  <div className="space-y-2">
+                    <h3 className="text-xl sm:text-2xl font-black text-slate-900 leading-tight">Die entscheidenden Details.</h3>
+                    <p className="text-slate-500 text-xs sm:text-sm">Je präziser Ihre Angaben, desto wertvoller ist unser Feedback.</p>
+                  </div>
 
-                    {/* Q6: employment_type */}
-                    <div className="space-y-2">
-                      <label className="text-xs font-bold text-slate-700 uppercase tracking-wider">6. Beschäftigung / Einkommensform</label>
-                      <select 
-                        className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl p-3.5 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none transition-all"
-                        value={formData.employment_type}
-                        onChange={(e) => setFormData({...formData, employment_type: e.target.value})}
-                      >
-                        <option value="">Bitte wählen...</option>
-                        <option value="angestellt">angestellt</option>
-                        <option value="selbstständig">selbstständig</option>
-                        <option value="gemischt">gemischt</option>
-                        <option value="variabel (Bonus/Provision)">variabel (Bonus/Provision)</option>
-                        <option value="lieber nicht angeben">lieber nicht angeben</option>
-                      </select>
-                    </div>
-
-                    {/* Q7: equity_source (Multi-select style) */}
-                    <div className="space-y-3">
-                      <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block">7. Eigenmittel-Quelle (Mehrfachauswahl)</label>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                        {[
-                          "Erspartes", "Säule 3a", "Pensionskasse (2. Säule)", 
-                          "Familie/Schenkung", "noch im Aufbau", "unklar"
-                        ].map((src) => (
+                  <div className="space-y-6 sm:space-y-8">
+                    <div className="space-y-3 sm:space-y-4">
+                      <label className="text-[10px] sm:text-xs font-black text-slate-900 uppercase tracking-widest">Erwerbsform</label>
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3">
+                        {['Angestellt', 'Selbstständig', 'Gemischt'].map(t => (
                           <button
-                            key={src}
-                            type="button"
-                            onClick={() => toggleEquitySource(src)}
-                            className={`flex items-center gap-3 p-3 rounded-lg border-2 text-xs font-bold transition-all ${
-                              formData.equity_source.includes(src) 
-                              ? 'bg-blue-50 border-blue-500 text-blue-700' 
-                              : 'bg-white border-slate-100 text-slate-600 hover:border-blue-200'
+                            key={t}
+                            onClick={() => setFormData({...formData, employment_type: t})}
+                            className={`p-3 sm:p-4 rounded-xl border-2 text-xs sm:text-sm font-bold transition-all ${
+                              formData.employment_type === t ? 'border-blue-600 bg-blue-50 text-blue-700' : 'border-slate-100'
                             }`}
                           >
-                            <div className={`w-4 h-4 rounded border flex items-center justify-center transition-colors ${
-                              formData.equity_source.includes(src) ? 'bg-blue-500 border-blue-500' : 'bg-white border-slate-300'
-                            }`}>
-                              {formData.equity_source.includes(src) && (
-                                <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20"><path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" /></svg>
-                              )}
-                            </div>
+                            {t}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="space-y-3 sm:space-y-4">
+                      <label className="text-[10px] sm:text-xs font-black text-slate-900 uppercase tracking-widest">Eigenmittel-Quellen</label>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
+                        {['Erspartes', '3a / Vorsorge', 'Pensionskasse', 'Schenkung/Erbvorbezug'].map(src => (
+                          <button
+                            key={src}
+                            onClick={() => toggleEquitySource(src)}
+                            className={`p-3 sm:p-4 rounded-xl border-2 flex items-center justify-between text-xs sm:text-sm font-bold transition-all ${
+                              formData.equity_source.includes(src) ? 'border-blue-600 bg-blue-50 text-blue-700' : 'border-slate-100'
+                            }`}
+                          >
                             {src}
+                            {formData.equity_source.includes(src) && <div className="bg-blue-600 rounded-full p-0.5"><IconCheck /></div>}
                           </button>
                         ))}
                       </div>
@@ -420,29 +365,112 @@ const App: React.FC = () => {
                   </div>
 
                   <button 
-                    type="submit"
-                    disabled={!isStep2Valid}
-                    className="w-full bg-[#2663EB] text-white py-4 rounded-xl font-bold text-lg shadow-lg hover:bg-blue-700 transition-all disabled:opacity-50"
-                  >
-                    Ergebnis präzisieren
-                  </button>
-                  
-                  <button 
-                    type="button"
                     onClick={() => setModalView('result')}
-                    className="w-full text-slate-400 text-[10px] font-bold uppercase tracking-widest hover:text-slate-600"
+                    className="w-full bg-blue-600 text-white py-4 sm:py-5 rounded-xl sm:rounded-[20px] font-black text-base sm:text-lg shadow-xl hover:bg-blue-700 transition-all"
                   >
-                    &larr; Zurück zum Ergebnis
+                    Analyse anzeigen
                   </button>
-                </form>
+                </div>
+              )}
+
+              {/* LEAD CAPTURE: Final Form */}
+              {modalView === 'leadCapture' && (
+                <div className="animate-fade-in space-y-8 sm:space-y-10">
+                  <div className="space-y-2">
+                    <h3 className="text-xl sm:text-2xl font-black text-slate-900 leading-tight">Fast geschafft!</h3>
+                    <p className="text-slate-500 text-xs sm:text-sm">Wohin dürfen wir Ihre detaillierte Auswertung senden?</p>
+                  </div>
+
+                  <form 
+                    className="space-y-5"
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      track('lead_capture_submit', formData);
+                      setModalView('step1'); // Reset or show success
+                      closeModal();
+                      alert('Vielen Dank! Wir haben Ihre Daten erhalten und melden uns in Kürze.');
+                    }}
+                  >
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-black text-slate-900 uppercase tracking-widest">Vorname</label>
+                        <input 
+                          type="text" 
+                          required
+                          placeholder="Max"
+                          className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl p-3 sm:p-4 text-xs sm:text-sm font-bold focus:border-blue-600 outline-none"
+                          value={formData.firstname}
+                          onChange={(e) => setFormData({...formData, firstname: e.target.value})}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-black text-slate-900 uppercase tracking-widest">Name</label>
+                        <input 
+                          type="text" 
+                          required
+                          placeholder="Mustermann"
+                          className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl p-3 sm:p-4 text-xs sm:text-sm font-bold focus:border-blue-600 outline-none"
+                          value={formData.lastname}
+                          onChange={(e) => setFormData({...formData, lastname: e.target.value})}
+                        />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-black text-slate-900 uppercase tracking-widest">Telefon</label>
+                        <input 
+                          type="tel" 
+                          required
+                          placeholder="+41 79 123 45 67"
+                          className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl p-3 sm:p-4 text-xs sm:text-sm font-bold focus:border-blue-600 outline-none"
+                          value={formData.phone}
+                          onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-black text-slate-900 uppercase tracking-widest">E-Mail</label>
+                        <input 
+                          type="email" 
+                          required
+                          placeholder="beispiel@mail.ch"
+                          className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl p-3 sm:p-4 text-xs sm:text-sm font-bold focus:border-blue-600 outline-none"
+                          value={formData.email}
+                          onChange={(e) => setFormData({...formData, email: e.target.value})}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black text-slate-900 uppercase tracking-widest">Nachricht (Optional)</label>
+                      <textarea 
+                        placeholder="Haben Sie eine spezifische Frage?"
+                        rows={3}
+                        className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl p-3 sm:p-4 text-xs sm:text-sm font-bold focus:border-blue-600 outline-none resize-none"
+                        value={formData.message}
+                        onChange={(e) => setFormData({...formData, message: e.target.value})}
+                      />
+                    </div>
+
+                    <div className="pt-4">
+                      <button 
+                        type="submit"
+                        className="w-full bg-blue-600 text-white py-4 sm:py-5 rounded-xl sm:rounded-[20px] font-black text-base sm:text-lg shadow-xl hover:bg-blue-700 transition-all"
+                      >
+                        Analyse jetzt kostenlos anfordern
+                      </button>
+                      <p className="text-center text-[10px] text-slate-400 mt-4 uppercase font-bold tracking-widest">Kostenlos & Unverbindlich</p>
+                    </div>
+                  </form>
+                </div>
               )}
             </div>
 
             {/* Modal Footer */}
-            <div className="bg-slate-50 px-6 py-4 border-t border-slate-100 flex-shrink-0">
-              <p className="text-[10px] text-slate-400 uppercase font-bold tracking-widest text-center leading-relaxed">
-                Hinweis: Dieser Realitätscheck ist eine erste Einordnung und ersetzt keine Bankprüfung. Ihre Angaben werden ausschliesslich zur Einordnung verwendet.
-              </p>
+            <div className="bg-slate-50 px-6 py-4 border-t border-slate-100 flex-shrink-0 text-center">
+              <div className="flex items-center justify-center gap-2 mb-1">
+                 <svg className="w-3 h-3 text-emerald-500" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 4.946-2.597 9.181-6.5 11.5a11.954 11.954 0 01-6.5-11.5c0-.68.056-1.35.166-2.001zm8.341 8.592a.75.75 0 00-1.014-1.074 3.25 3.25 0 01-4.493-4.493.75.75 0 00-1.074-1.014 4.75 4.75 0 006.581 6.581z" clipRule="evenodd" /></svg>
+                 <span className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">DSGVO Konform · SSL Verschlüsselt</span>
+              </div>
             </div>
           </div>
         </div>

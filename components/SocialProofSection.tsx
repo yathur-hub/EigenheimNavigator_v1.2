@@ -1,46 +1,156 @@
 
-import React from 'react';
+import React, { useRef, useState, useEffect } from 'react';
+import { motion } from 'motion/react';
 
 interface SocialProofSectionProps {
   onStartCheck: () => void;
 }
 
 const SocialProofSection: React.FC<SocialProofSectionProps> = ({ onStartCheck }) => {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(true);
+
   const testimonials = [
-    { name: "Anna & Marc", text: "Wir dachten, unser Eigenkapital reicht nie aus. Durch die neue Strategie wissen wir jetzt genau, worauf wir sparen müssen." },
-    { name: "Sandro K.", text: "Endlich mal eine Beratung ohne Verkaufsabsicht. Die Analyse hat mir die Augen geöffnet, was meine Bank mir verschwiegen hat." },
-    { name: "Familie Müller", text: "Der Realitätscheck war hart, aber notwendig. Heute wohnen wir in unserem Haus, weil wir den Fokus korrigiert haben." }
+    { 
+      name: "Bojana & Milos", 
+      text: "Wir haben gemerkt, wir geben so viele Mittel für die Mietqohnung aus und das war der Beweggrund für das Eigenheim, dass man für das eigene Zuhause im Monat viel weniger zahlt als zur Miete.",
+      videoId: "MceBnGpFSd8"
+    },
+    { 
+      name: "Anna & Marc", 
+      text: "Unsere größte Sorge war das Finanzielle: Klappt das überhaupt? Funktioniert das überhaupt? Ich glaube, die Transparenz, dass wir das immer in den Listen und die Zahlen gesehen haben, hat uns das verständlich gemacht. Dadurch wurde man beruhigt.",
+      videoId: "O5T_7lwLa3M"
+    },
+    { 
+      name: "DAVID & KRISTINA", 
+      text: "Ich denke, ohne den Eigenheimnavigator wäre der Kauf ziemlich stressig verlaufen. Wir hätten sicher sehr viel Zeit damit verloren, uns selbst zu erkundigen und uns durch die vielen verschiedenen Methoden und Vorgehensweisen zu kämpfen.",
+      videoId: "-IoxwK9KQ3w"
+    },
+    { 
+      name: "Niru & Adsaya", 
+      text: "Zwei Tage vor dem Notartermin hat uns die Bank plötzlich abgesagt. Wir dachten, jetzt haben wir das ganze Geld verloren. Aber der Eigenheimnavigator hat extrem flexibel und lösungsorientiert reagiert und innerhalb von wenigen Tagen direkt die nächste Bank und die perfekte Lösung für uns gefunden.",
+      videoId: "eIOh5YimjMQ" 
+    },
+    { 
+      name: "Familie Lekaj", 
+      text: "Unsere grösste Angst war, dass uns die liquiden, finanziellen Mittel für den Hauskauf fehlen. Wir haben uns immer vorgestellt, dass wir zwingend 20 Prozent in bar brauchen. Aber der Eigenheimnavigator hat uns eine andere Perspektive aufgezeigt und bewiesen, dass es doch möglich ist.",
+      videoId: "HXzGOikamlg" 
+    }
   ];
 
+  const checkScroll = () => {
+    if (scrollRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
+      setCanScrollLeft(scrollLeft > 0);
+      setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 5);
+    }
+  };
+
+  useEffect(() => {
+    checkScroll();
+    const currentRef = scrollRef.current;
+    if (currentRef) {
+      currentRef.addEventListener('scroll', checkScroll);
+    }
+    window.addEventListener('resize', checkScroll);
+    return () => {
+      if (currentRef) currentRef.removeEventListener('scroll', checkScroll);
+      window.removeEventListener('resize', checkScroll);
+    };
+  }, []);
+
+  const scroll = (direction: 'left' | 'right') => {
+    if (scrollRef.current) {
+      const { clientWidth } = scrollRef.current;
+      const scrollAmount = direction === 'left' ? -clientWidth * 0.8 : clientWidth * 0.8;
+      scrollRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+    }
+  };
+
   return (
-    <section id="customers" className="py-20 px-4 bg-white overflow-hidden">
+    <section id="customers" className="py-12 sm:py-24 px-4 bg-slate-50 overflow-hidden relative">
       <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
-            Diese Kunden standen genau dort, wo Sie heute stehen.
-          </h2>
-          <p className="text-xl text-slate-500 italic">“Vom Zweifel zur Finanzierung – mit Klarheit statt Hoffnung.”</p>
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 sm:mb-12 gap-6">
+          <div className="max-w-2xl">
+            <h2 className="text-2xl sm:text-3xl md:text-5xl font-black text-slate-900 mb-4 sm:mb-6 tracking-tight leading-tight">
+              Diese Kunden standen genau dort, wo Sie heute stehen.
+            </h2>
+            <p className="text-lg sm:text-xl text-slate-500 italic">“Vom Zweifel zur Finanzierung – mit Klarheit statt Hoffnung.”</p>
+          </div>
+          
+          {/* Navigation Buttons */}
+          <div className="flex gap-3">
+            <button 
+              onClick={() => scroll('left')}
+              disabled={!canScrollLeft}
+              className={`w-12 h-12 rounded-full flex items-center justify-center border-2 transition-all ${
+                canScrollLeft ? 'border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white' : 'border-slate-200 text-slate-200 cursor-not-allowed'
+              }`}
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 19l-7-7 7-7" /></svg>
+            </button>
+            <button 
+              onClick={() => scroll('right')}
+              disabled={!canScrollRight}
+              className={`w-12 h-12 rounded-full flex items-center justify-center border-2 transition-all ${
+                canScrollRight ? 'border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white' : 'border-slate-200 text-slate-200 cursor-not-allowed'
+              }`}
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 5l7 7-7 7" /></svg>
+            </button>
+          </div>
         </div>
 
-        {/* Desktop Grid / Mobile Slider (CSS scroll snap) */}
-        <div className="flex md:grid md:grid-cols-3 gap-6 overflow-x-auto snap-x pb-8 md:pb-0 no-scrollbar">
+        {/* Slider Container */}
+        <div 
+          ref={scrollRef}
+          className="flex gap-6 overflow-x-auto snap-x snap-mandatory pb-12 no-scrollbar scroll-smooth"
+        >
           {testimonials.map((t, idx) => (
-            <div key={idx} className="min-w-[85vw] md:min-w-0 snap-center bg-white border border-slate-100 p-6 rounded-[24px] shadow-sm">
-              <div className="aspect-video bg-slate-100 rounded-[16px] mb-6 flex flex-col items-center justify-center cursor-pointer group hover:bg-slate-200 transition-colors" data-event="video_placeholder_click">
-                <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-md group-hover:scale-110 transition-transform">
-                  <svg className="w-6 h-6 text-[#2663EB] ml-1" fill="currentColor" viewBox="0 0 20 20"><path d="M6 4l10 6-10 6V4z"></path></svg>
-                </div>
-                <span className="mt-3 text-xs font-bold text-slate-400 uppercase tracking-widest">Kundenstory Video</span>
+            <motion.div 
+              key={idx} 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: idx * 0.1 }}
+              className="min-w-[85vw] md:min-w-[400px] snap-start bg-white border border-slate-100 p-8 rounded-[32px] shadow-sm flex flex-col hover:shadow-xl transition-shadow duration-500"
+            >
+              <div className="aspect-video bg-slate-100 rounded-[24px] mb-8 overflow-hidden shadow-inner relative group">
+                {t.videoId ? (
+                  <iframe
+                    className="absolute inset-0 w-full h-full"
+                    src={`https://www.youtube.com/embed/${t.videoId}?rel=0`}
+                    title={`Kundenstory ${t.name}`}
+                    frameBorder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  ></iframe>
+                ) : (
+                  <div className="w-full h-full flex flex-col items-center justify-center cursor-pointer group hover:bg-slate-200 transition-colors" data-event="video_placeholder_click">
+                    <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-md group-hover:scale-110 transition-transform">
+                      <svg className="w-8 h-8 text-[#2663EB] ml-1" fill="currentColor" viewBox="0 0 20 20"><path d="M6 4l10 6-10 6V4z"></path></svg>
+                    </div>
+                    <span className="mt-4 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Kundenstory Video</span>
+                  </div>
+                )}
               </div>
-              <p className="text-slate-700 italic mb-4 leading-relaxed">“{t.text}”</p>
-              <h4 className="font-bold text-slate-900">– {t.name}</h4>
-            </div>
+              <div className="flex-grow">
+                <p className="text-slate-700 italic mb-6 leading-relaxed text-lg">“{t.text}”</p>
+              </div>
+              <div className="flex items-center gap-4 pt-6 border-t border-slate-50">
+                <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-bold text-sm">
+                  {t.name.split(' ')[0][0]}
+                </div>
+                <h4 className="font-extrabold text-slate-900 tracking-tight">{t.name}</h4>
+              </div>
+            </motion.div>
           ))}
         </div>
 
-        <div className="mt-16 text-center">
+        <div className="mt-12 text-center">
            <button 
-            className="bg-[#2663EB] text-white px-10 py-4 rounded-[14px] font-bold text-lg shadow-lg hover:bg-blue-700 transition-all"
+            className="bg-[#2663EB] text-white px-12 py-5 rounded-2xl font-black text-lg shadow-xl hover:bg-blue-700 hover:-translate-y-1 transition-all active:scale-95"
             data-event="cta_primary_proof_click"
             onClick={onStartCheck}
           >

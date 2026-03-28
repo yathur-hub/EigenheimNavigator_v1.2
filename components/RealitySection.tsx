@@ -22,10 +22,10 @@ const RealitySection: React.FC<RealitySectionProps> = ({ onStartCheck }) => {
   ];
 
   return (
-    <section id="how-it-works" className="py-20 px-4 bg-white">
+    <section id="how-it-works" className="py-12 sm:py-20 px-4 bg-white">
       <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-16 max-w-3xl mx-auto">
-          <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-6">
+        <div className="text-center mb-12 sm:mb-16 max-w-3xl mx-auto">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900 mb-6 leading-tight">
             Die meisten scheitern nicht am Traum – sondern an falschen Annahmen.
           </h2>
           <p className="text-slate-600 mb-4 leading-relaxed">

@@ -17,10 +17,10 @@ const clientImages = [
 
 const PartnerSection: React.FC<PartnerSectionProps> = ({ onStartCheck }) => {
   return (
-    <section id="gallery" className="py-24 px-4 bg-white border-b border-slate-100">
+    <section id="gallery" className="py-12 sm:py-24 px-4 bg-white border-b border-slate-100">
       <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-16 max-w-3xl mx-auto">
-          <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-6">
+        <div className="text-center mb-12 sm:mb-16 max-w-3xl mx-auto">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900 mb-6 leading-tight">
             Klarheit statt Hoffnung: Unsere Kunden auf dem Weg ins Eigenheim.
           </h2>
           <p className="text-slate-600 mb-4 leading-relaxed">

@@ -18,10 +18,10 @@ const ProcessSection: React.FC = () => {
   ];
 
   return (
-    <section className="py-24 px-4 bg-slate-900 text-white overflow-hidden">
+    <section className="py-12 sm:py-24 px-4 bg-slate-900 text-white overflow-hidden">
       <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-20">
-          <h2 className="text-3xl md:text-5xl font-bold mb-6">So kommen Sie zu Ihrem Eigenheim – in 3 Schritten.</h2>
+        <div className="text-center mb-12 sm:mb-20">
+          <h2 className="text-2xl sm:text-3xl md:text-5xl font-bold mb-6 leading-tight">So kommen Sie zu Ihrem Eigenheim – in 3 Schritten.</h2>
           <div className="h-1.5 bg-[#F87101] w-24 mx-auto rounded-full"></div>
         </div>
 

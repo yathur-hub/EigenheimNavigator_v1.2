@@ -45,25 +45,25 @@ const FAQSection: React.FC = () => {
   };
 
   return (
-    <section id="faq" className="py-24 px-4 bg-white">
+    <section id="faq" className="py-12 sm:py-24 px-4 bg-white">
       <div className="max-w-3xl mx-auto">
-        <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-12 text-center">Was uns fast alle fragen</h2>
+        <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900 mb-8 sm:mb-12 text-center leading-tight">Was uns fast alle fragen</h2>
         
-        <div className="space-y-4">
+        <div className="space-y-3 sm:space-y-4">
           {faqs.map((faq, idx) => (
-            <div key={idx} className="border border-slate-100 rounded-[16px] overflow-hidden">
+            <div key={idx} className="border border-slate-100 rounded-xl sm:rounded-[16px] overflow-hidden">
               <button 
-                className="w-full flex items-center justify-between p-6 text-left hover:bg-slate-50 transition-colors"
+                className="w-full flex items-center justify-between p-4 sm:p-6 text-left hover:bg-slate-50 transition-colors"
                 onClick={() => toggle(idx)}
               >
-                <span className="font-bold text-slate-800 pr-4">{faq.q}</span>
-                <span className={`flex-shrink-0 w-6 h-6 transition-transform ${openIndex === idx ? 'rotate-180' : ''}`}>
+                <span className="font-bold text-slate-800 pr-4 text-sm sm:text-base">{faq.q}</span>
+                <span className={`flex-shrink-0 w-5 h-5 sm:w-6 sm:h-6 transition-transform ${openIndex === idx ? 'rotate-180' : ''}`}>
                   <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
                 </span>
               </button>
               {openIndex === idx && (
-                <div className="p-6 pt-0 bg-white">
-                  <p className="text-slate-600 leading-relaxed mb-4">{faq.a}</p>
+                <div className="p-4 sm:p-6 pt-0 bg-white">
+                  <p className="text-slate-600 leading-relaxed mb-4 text-sm sm:text-base">{faq.a}</p>
                   <button 
                     className="text-[#F87101] font-bold text-sm hover:underline"
                     data-event="faq_cta_click"

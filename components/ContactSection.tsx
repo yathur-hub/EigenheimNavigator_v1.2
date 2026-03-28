@@ -3,16 +3,16 @@ import React from 'react';
 
 const ContactSection: React.FC = () => {
   return (
-    <section id="contact" className="py-24 px-4 bg-slate-50">
+    <section id="contact" className="py-12 sm:py-24 px-4 bg-slate-50">
       <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-16 max-w-2xl mx-auto">
-          <h2 className="text-3xl md:text-5xl font-bold text-slate-900 mb-6">Finden Sie heraus, ob Ihr Eigenheim realistisch ist.</h2>
-          <p className="text-lg text-slate-600">Verlieren Sie keine Zeit mehr mit Suchen ohne Gewissheit. Wir helfen Ihnen, Klarheit zu gewinnen und Chancen zu nutzen.</p>
+        <div className="text-center mb-12 sm:mb-16 max-w-2xl mx-auto">
+          <h2 className="text-2xl sm:text-3xl md:text-5xl font-bold text-slate-900 mb-6 leading-tight">Finden Sie heraus, ob Ihr Eigenheim realistisch ist.</h2>
+          <p className="text-base sm:text-lg text-slate-600">Verlieren Sie keine Zeit mehr mit Suchen ohne Gewissheit. Wir helfen Ihnen, Klarheit zu gewinnen und Chancen zu nutzen.</p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12 lg:gap-20">
           {/* Left: Form */}
-          <div className="bg-white p-8 md:p-10 rounded-[32px] shadow-xl border border-gray-100">
+          <div className="bg-white p-6 sm:p-8 md:p-10 rounded-[24px] sm:rounded-[32px] shadow-xl border border-gray-100">
             <form className="space-y-6" data-event="form_start">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <div>

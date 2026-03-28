@@ -22,11 +22,11 @@ const SolutionSection: React.FC<SolutionSectionProps> = ({ onStartCheck }) => {
   ];
 
   return (
-    <section className="py-20 px-4 bg-slate-50">
+    <section className="py-12 sm:py-20 px-4 bg-slate-50">
       <div className="max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center mb-16">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center mb-12 sm:mb-16">
           <div>
-            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-6 leading-tight">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900 mb-6 leading-tight">
               Wir zeigen nicht nur Möglichkeiten – wir sagen Ihnen ehrlich, ob es funktioniert.
             </h2>
             <p className="text-slate-600 mb-6 leading-relaxed">
@@ -36,7 +36,7 @@ const SolutionSection: React.FC<SolutionSectionProps> = ({ onStartCheck }) => {
               Klarheit ist unser höchstes Gut. Wenn eine Finanzierung aktuell nicht möglich ist, sagen wir Ihnen das direkt – und zeigen Ihnen den Weg auf, wie Sie in 12 oder 24 Monaten an den Punkt kommen, an dem es funktioniert. Keine falschen Versprechen, sondern echte Perspektiven.
             </p>
 
-            <div className="flex flex-col sm:flex-row items-center gap-4 mt-10">
+            <div className="hidden sm:flex flex-col sm:flex-row items-center gap-4 mt-10">
               <button 
                 className="w-full sm:w-auto bg-[#2663EB] text-white px-8 py-4 rounded-[14px] font-bold text-lg hover:bg-blue-700 transition-all"
                 data-event="cta_primary_click"
