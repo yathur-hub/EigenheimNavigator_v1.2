@@ -370,7 +370,7 @@ const App: React.FC = () => {
                             onChange={(e) => setFormData({...formData, privacyAccepted: e.target.checked})}
                           />
                           <span className="text-xs text-slate-500 font-medium leading-relaxed group-hover:text-slate-700 transition-colors">
-                            Ich stimme den <Link to="/datenschutz" target="_blank" rel="noopener noreferrer" className="text-blue-600 font-bold hover:underline">Datenschutzbestimmungen</Link> zu*
+                            Ich stimme der <Link to="/datenschutz" target="_blank" rel="noopener noreferrer" className="text-blue-600 font-bold hover:underline">Datenschutzerklärung</Link> zu*
                           </span>
                         </label>
                       </div>
