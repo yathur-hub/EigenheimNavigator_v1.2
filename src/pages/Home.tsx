@@ -7,6 +7,7 @@ import SolutionSection from '../../components/SolutionSection';
 import SocialProofSection from '../../components/SocialProofSection';
 import ProcessSection from '../../components/ProcessSection';
 import PartnerSection from '../../components/PartnerSection';
+import TeamSection from '../../components/TeamSection';
 import FAQSection from '../../components/FAQSection';
 import ContactSection from '../../components/ContactSection';
 
@@ -24,6 +25,7 @@ const Home: React.FC<HomeProps> = ({ onStartCheck }) => {
       <SolutionSection onStartCheck={onStartCheck} />
       <ProcessSection onStartCheck={onStartCheck} />
       <PartnerSection onStartCheck={onStartCheck} />
+      <TeamSection onStartCheck={onStartCheck} />
       <FAQSection onStartCheck={onStartCheck} />
       <ContactSection />
     </>
