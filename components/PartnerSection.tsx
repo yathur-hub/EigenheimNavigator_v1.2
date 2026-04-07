@@ -58,7 +58,7 @@ const PartnerSection: React.FC<PartnerSectionProps> = ({ onStartCheck }) => {
             data-event="cta_primary_gallery_click"
             onClick={onStartCheck}
           >
-            Erstgespräch buchen
+            Den Weg zum Eigenheim starten
           </button>
         </div>
       </div>

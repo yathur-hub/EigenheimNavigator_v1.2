@@ -60,10 +60,6 @@ const TeamSection: React.FC<TeamSectionProps> = ({ onStartCheck }) => {
                     Sondern klare Entscheidungen auf Basis eurer Situation.
                   </p>
                 </div>
-                
-                <p className="pt-6 border-t border-slate-200 italic">
-                  Mit dem Eigenheim-NAVI wisst ihr nicht irgendwann, was möglich ist, sondern trefft heute die richtigen Entscheidungen für morgen.
-                </p>
               </div>
               
               <div className="mt-12">
