@@ -9,15 +9,15 @@ const SolutionSection: React.FC<SolutionSectionProps> = ({ onStartCheck }) => {
   const outcomes = [
     {
       title: "Realistische Finanzierungsanalyse",
-      text: "Wir klären, was Banken Ihnen effektiv bewilligen. Inklusive Tragbarkeit, benötigtem Eigenkapital und Ihrem maximalen Kaufpreis-Spielraum."
+      text: "Wir klären, was Banken dir effektiv bewilligen. Inklusive Tragbarkeit, benötigtem Eigenkapital und deinem maximalen Kaufpreis-Spielraum."
     },
     {
       title: "Klare Kaufstrategie",
-      text: "Wann ist der beste Kaufzeitpunkt für Sie? Wir definieren Prioritäten, optimieren Ihre Suchstrategie und bereiten Sie auf Verhandlungen vor."
+      text: "Wann ist der beste Kaufzeitpunkt für dich? Wir definieren Prioritäten, optimieren deine Suchstrategie und bereiten dich auf Verhandlungen vor."
     },
     {
       title: "Zugang zu Partnern",
-      text: "Wenn es Sinn macht, bringen wir Sie direkt mit den richtigen Finanzierungspartnern zusammen – für konkrete Angebote statt vager Versprechen."
+      text: "Wenn es Sinn macht, bringen wir dich direkt mit den richtigen Finanzierungspartnern zusammen – für konkrete Angebote statt vager Versprechen."
     }
   ];
 
@@ -27,13 +27,13 @@ const SolutionSection: React.FC<SolutionSectionProps> = ({ onStartCheck }) => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center mb-12 sm:mb-16">
           <div>
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900 mb-6 leading-tight">
-              Wir zeigen nicht nur Möglichkeiten – wir sagen Ihnen ehrlich, ob es funktioniert.
+              Wir zeigen nicht nur Möglichkeiten – wir sagen dir ehrlich, ob es funktioniert.
             </h2>
             <p className="text-slate-600 mb-6 leading-relaxed">
-              Standardberatungen gibt es wie Sand am Meer. Wir konzentrieren uns auf das Wesentliche: Ihr Ergebnis. Nach unserem Austausch wissen Sie nicht nur theoretisch, wie Hypotheken funktionieren, sondern Sie haben einen Plan für Ihr eigenes Projekt in der Hand.
+              Standardberatungen gibt es wie Sand am Meer. Wir konzentrieren uns auf das Wesentliche: dein Ergebnis. Nach unserem Austausch weisst du nicht nur theoretisch, wie Hypotheken funktionieren, sondern du hast einen Plan für dein eigenes Projekt in der Hand.
             </p>
             <p className="text-slate-600 leading-relaxed">
-              Klarheit ist unser höchstes Gut. Wenn eine Finanzierung aktuell nicht möglich ist, sagen wir Ihnen das direkt – und zeigen Ihnen den Weg auf, wie Sie in 12 oder 24 Monaten an den Punkt kommen, an dem es funktioniert. Keine falschen Versprechen, sondern echte Perspektiven.
+              Klarheit ist unser höchstes Gut. Wenn eine Finanzierung aktuell nicht möglich ist, sagen wir dir das direkt – und zeigen dir den Weg auf, wie du in 12 oder 24 Monaten an den Punkt kommst, an dem es funktioniert. Keine falschen Versprechen, sondern echte Perspektiven.
             </p>
 
             <div className="hidden sm:flex flex-col sm:flex-row items-center gap-4 mt-10">
@@ -42,14 +42,7 @@ const SolutionSection: React.FC<SolutionSectionProps> = ({ onStartCheck }) => {
                 data-event="cta_primary_click"
                 onClick={onStartCheck}
               >
-                Eigenheim-Check starten
-              </button>
-              <button 
-                className="w-full sm:w-auto bg-white text-[#F87101] border-2 border-[#F87101] px-8 py-4 rounded-[14px] font-bold text-lg hover:bg-orange-50 transition-all"
-                data-event="cta_secondary_click"
-                onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}
-              >
-                Kurzberatung vereinbaren
+                Erstgespräch buchen
               </button>
             </div>
           </div>

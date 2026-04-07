@@ -1,11 +1,15 @@
 
 import React from 'react';
 
-const ProcessSection: React.FC = () => {
+interface ProcessSectionProps {
+  onStartCheck: () => void;
+}
+
+const ProcessSection: React.FC<ProcessSectionProps> = ({ onStartCheck }) => {
   const steps = [
     {
       title: "Standortbestimmung",
-      text: "Kurz-Check + erstes Gespräch, damit Zahlen und Realität zusammenpassen. Wir legen die Karten auf den Tisch."
+      text: "Erstgespräch + erste Analyse, damit Zahlen und Realität zusammenpassen. Wir legen die Karten auf den Tisch."
     },
     {
       title: "Strategie & Möglichkeiten",
@@ -21,7 +25,7 @@ const ProcessSection: React.FC = () => {
     <section className="py-12 sm:py-24 px-4 bg-slate-900 text-white overflow-hidden">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-12 sm:mb-20">
-          <h2 className="text-2xl sm:text-3xl md:text-5xl font-bold mb-6 leading-tight">So kommen Sie zu Ihrem Eigenheim – in 3 Schritten.</h2>
+          <h2 className="text-2xl sm:text-3xl md:text-5xl font-bold mb-6 leading-tight">So kommst du zu deinem Eigenheim – in 3 Schritten.</h2>
           <div className="h-1.5 bg-[#F87101] w-24 mx-auto rounded-full"></div>
         </div>
 
@@ -46,7 +50,7 @@ const ProcessSection: React.FC = () => {
           <button 
             className="bg-[#2663EB] text-white px-10 py-5 rounded-[16px] font-bold text-xl shadow-2xl hover:bg-blue-700 transition-all hover:scale-105"
             data-event="cta_primary_process_click"
-            onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}
+            onClick={onStartCheck}
           >
             Erstgespräch sichern
           </button>

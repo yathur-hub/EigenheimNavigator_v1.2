@@ -14,16 +14,16 @@ const SocialProofSection: React.FC<SocialProofSectionProps> = ({ onStartCheck })
   const testimonials = [
     { 
       name: "Bojana & Milos", 
-      text: "Wir haben gemerkt, wir geben so viele Mittel für die Mietqohnung aus und das war der Beweggrund für das Eigenheim, dass man für das eigene Zuhause im Monat viel weniger zahlt als zur Miete.",
+      text: "Wir haben gemerkt, wir geben so viele Mittel für die Mietwohnung aus und das war der Beweggrund für das Eigenheim, dass man für das eigene Zuhause im Monat viel weniger zahlt als zur Miete.",
       videoId: "MceBnGpFSd8"
     },
     { 
       name: "Anna & Marc", 
-      text: "Unsere größte Sorge war das Finanzielle: Klappt das überhaupt? Funktioniert das überhaupt? Ich glaube, die Transparenz, dass wir das immer in den Listen und die Zahlen gesehen haben, hat uns das verständlich gemacht. Dadurch wurde man beruhigt.",
+      text: "Unsere grösste Sorge war das Finanzielle: Klappt das überhaupt? Funktioniert das überhaupt? Ich glaube, die Transparenz, dass wir das immer in den Listen und die Zahlen gesehen haben, hat uns das verständlich gemacht. Dadurch wurde man beruhigt.",
       videoId: "O5T_7lwLa3M"
     },
     { 
-      name: "DAVID & KRISTINA", 
+      name: "David & Kristina", 
       text: "Ich denke, ohne den Eigenheimnavigator wäre der Kauf ziemlich stressig verlaufen. Wir hätten sicher sehr viel Zeit damit verloren, uns selbst zu erkundigen und uns durch die vielen verschiedenen Methoden und Vorgehensweisen zu kämpfen.",
       videoId: "-IoxwK9KQ3w"
     },
@@ -74,7 +74,7 @@ const SocialProofSection: React.FC<SocialProofSectionProps> = ({ onStartCheck })
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 sm:mb-12 gap-6">
           <div className="max-w-2xl">
             <h2 className="text-2xl sm:text-3xl md:text-5xl font-black text-slate-900 mb-4 sm:mb-6 tracking-tight leading-tight">
-              Diese Kunden standen genau dort, wo Sie heute stehen.
+              Diese Kunden standen genau dort, wo du heute stehst.
             </h2>
             <p className="text-lg sm:text-xl text-slate-500 italic">“Vom Zweifel zur Finanzierung – mit Klarheit statt Hoffnung.”</p>
           </div>
@@ -151,10 +151,9 @@ const SocialProofSection: React.FC<SocialProofSectionProps> = ({ onStartCheck })
         <div className="mt-12 text-center">
            <button 
             className="bg-[#2663EB] text-white px-12 py-5 rounded-2xl font-black text-lg shadow-xl hover:bg-blue-700 hover:-translate-y-1 transition-all active:scale-95"
-            data-event="cta_primary_proof_click"
             onClick={onStartCheck}
           >
-            Meine Chancen prüfen
+            Erstgespräch buchen
           </button>
         </div>
       </div>

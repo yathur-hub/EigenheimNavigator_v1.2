@@ -15,41 +15,39 @@ const Hero: React.FC<HeroProps> = ({ onStartCheck }) => {
           <div className="space-y-8 animate-fade-in order-2 lg:order-1">
             <div className="space-y-6">
               <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-extrabold text-slate-900 leading-[0.95] tracking-tighter">
-                Wie realistisch ist Ihr Eigenheim – <span className="text-blue-600">wirklich?</span>
+                Dein Weg zum Eigenheim – <span className="text-blue-600">einfach & klar.</span>
               </h1>
               <p className="text-base sm:text-lg md:text-xl text-slate-600 font-medium leading-relaxed max-w-lg">
-                Erhalten Sie eine ehrliche Einordnung zu Budget, Finanzierung und Kaufzeitpunkt – ohne Sales-Druck. In 90 Sekunden.
+                Buche dein kostenloses Erstgespräch und erhalte eine ehrliche Einordnung zu deinem Vorhaben.
               </p>
             </div>
 
-            <div className="hidden sm:flex flex-col sm:flex-row items-center gap-3 sm:gap-4 pt-4">
+            <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 pt-4">
               <button 
                 className="w-full sm:w-auto bg-blue-600 text-white px-6 sm:px-10 py-4 sm:py-5 rounded-xl sm:rounded-[20px] font-black text-base sm:text-lg shadow-xl shadow-blue-200 hover:bg-blue-700 transition-all hover:scale-[1.02] active:scale-[0.98]"
                 data-event="check_start"
                 onClick={onStartCheck}
               >
-                Realitätscheck starten
-              </button>
-              <button 
-                className="w-full sm:w-auto bg-white text-orange-600 border-2 border-orange-600 px-6 sm:px-10 py-4 sm:py-5 rounded-xl sm:rounded-[20px] font-black text-base sm:text-lg hover:bg-orange-50 transition-all active:scale-[0.98]"
-                data-event="cta_secondary_click"
-                onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}
-              >
-                Kurzberatung vereinbaren
+                Erstgespräch buchen
               </button>
             </div>
 
             <div className="space-y-6 pt-4">
               <div className="flex items-center gap-4">
                  <div className="flex -space-x-3">
-                   {[1,2,3,4].map(i => (
+                   {[
+                     "https://eigenheimnavigator.ch/images/client4.png",
+                     "https://eigenheimnavigator.ch/images/client5.png",
+                     "https://eigenheimnavigator.ch/images/client6.png",
+                     "https://eigenheimnavigator.ch/images/client7.png"
+                   ].map((src, i) => (
                      <div key={i} className="w-10 h-10 rounded-full border-2 border-white bg-slate-100 overflow-hidden">
-                       <img src={`https://i.pravatar.cc/100?u=${i}`} alt="user" className="w-full h-full object-cover" />
+                       <img src={src} alt="user" className="w-full h-full object-cover" />
                      </div>
                    ))}
                  </div>
                  <div className="text-xs text-slate-500 font-bold uppercase tracking-widest leading-tight">
-                    Über 1’350+ erfolgreiche <br />Analysen durchgeführt
+                    5.000 begleitete Paare <br />in der Schweiz
                  </div>
               </div>
               <div className="flex items-center gap-2 text-amber-500 font-bold">
@@ -71,7 +69,7 @@ const Hero: React.FC<HeroProps> = ({ onStartCheck }) => {
             >
               <iframe
                 className="absolute inset-0 w-full h-full"
-                src="https://www.youtube.com/embed/ELibSv3mUSo?rel=0"
+                src="https://www.youtube.com/embed/dkVAfWfe4oU?rel=0"
                 title="Eigenheim Navigator Video"
                 frameBorder="0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"

@@ -24,7 +24,7 @@ const PartnerSection: React.FC<PartnerSectionProps> = ({ onStartCheck }) => {
             Klarheit statt Hoffnung: Unsere Kunden auf dem Weg ins Eigenheim.
           </h2>
           <p className="text-slate-600 mb-4 leading-relaxed">
-            Hinter jeder erfolgreichen Finanzierung steht eine individuelle Geschichte. Wir haben über 1’350 Kunden dabei geholfen, die Blackbox «Bankenfinanzierung» zu verstehen und den Traum vom Eigenheim auf ein solides Fundament zu stellen.
+            Hinter jeder erfolgreichen Finanzierung steht eine individuelle Geschichte. Wir haben über 5’000 Paare dabei geholfen, die Blackbox «Bankenfinanzierung» zu verstehen und den Traum vom Eigenheim auf ein solides Fundament zu stellen.
           </p>
           <p className="text-slate-600 leading-relaxed">
             Vom ersten Realitätscheck bis zur Schlüsselübergabe – wir begleiten Menschen, keine Dossiers. Echte Ergebnisse, echte Emotionen, keine leeren Versprechen.
@@ -58,7 +58,7 @@ const PartnerSection: React.FC<PartnerSectionProps> = ({ onStartCheck }) => {
             data-event="cta_primary_gallery_click"
             onClick={onStartCheck}
           >
-            Meine Chancen prüfen
+            Erstgespräch buchen
           </button>
         </div>
       </div>

@@ -1,37 +1,41 @@
 
 import React, { useState } from 'react';
 
-const FAQSection: React.FC = () => {
+interface FAQSectionProps {
+  onStartCheck: () => void;
+}
+
+const FAQSection: React.FC<FAQSectionProps> = ({ onStartCheck }) => {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   const faqs = [
     {
       q: "Was kostet uns die Beratung?",
-      a: "Das Erstgespräch und der Eigenheim-Check sind für Sie kostenlos und absolut unverbindlich. Sollten weiterführende, kostenpflichtige Dienstleistungen sinnvoll sein, kommunizieren wir dies transparent im Voraus."
+      a: "Das Erstgespräch und die erste Analyse sind für dich kostenlos und absolut unverbindlich. Sollten weiterführende, kostenpflichtige Dienstleistungen sinnvoll sein, kommunizieren wir dies transparent im Voraus."
     },
     {
       q: "Was genau bekommen wir nach der Beratung?",
-      a: "Sie erhalten eine klare schriftliche Auswertung Ihrer Situation. Darin enthalten sind Ihr maximaler Kaufpreis, die Tragbarkeitsrechnung nach Bankenstandard und konkrete nächste Schritte für Ihre Suche."
+      a: "Du erhältst eine klare schriftliche Auswertung deiner Situation. Darin enthalten sind dein maximaler Kaufpreis, die Tragbarkeitsrechnung nach Bankenstandard und konkrete nächste Schritte für deine Suche."
     },
     {
       q: "Wie lange dauert das Ganze?",
-      a: "Der Eigenheim-Check online dauert ca. 60 Sekunden. Das erste Analysegespräch dauert in der Regel 30-45 Minuten und findet meist digital oder telefonisch statt – ganz wie es für Sie passt."
+      a: "Die Buchung für das Erstgespräch dauert ca. 60 Sekunden. Das erste Analysegespräch dauert in der Regel 30-45 Minuten und findet meist digital oder telefonisch statt – ganz wie es für dich passt."
     },
     {
       q: "Lohnt sich das, wenn wir erst in 1–3 Jahren kaufen wollen?",
-      a: "Absolut. Gerade dann ist es wichtig, heute die Weichen bei der Vorsorge und dem Sparplan zu stellen, damit Sie in zwei Jahren 'finanzierungsbereit' sind, wenn Ihr Traumobjekt auftaucht."
+      a: "Absolut. Gerade dann ist es wichtig, heute die Weichen bei der Vorsorge und dem Sparplan zu stellen, damit du in zwei Jahren 'finanzierungsbereit' bist, wenn dein Traumobjekt auftaucht."
     },
     {
       q: "Wo findet die Beratung statt?",
-      a: "Wir arbeiten primär ortsunabhängig via Video-Call. Das ist effizient für Sie und uns. Auf Wunsch sind nach Absprache natürlich auch physische Termine möglich."
+      a: "Wir arbeiten primär ortsunabhängig via Video-Call. Das ist effizient für dich und uns. Auf Wunsch sind nach Absprache natürlich auch physische Termine möglich."
     },
     {
       q: "Wir haben keine 20% Eigenkapital – lohnt sich das trotzdem?",
-      a: "Ja. Es gibt in der Schweiz verschiedene Wege (Vorsorgegelder, Schenkungen, Mietkauf-Modelle etc.), um Lücken zu schliessen. Wir prüfen für Sie ehrlich, ob einer dieser Wege für Sie gangbar ist."
+      a: "Ja. Es gibt in der Schweiz verschiedene Wege (Vorsorgegelder, Schenkungen, Mietkauf-Modelle etc.), um Lücken zu schliessen. Wir prüfen für dich ehrlich, ob einer dieser Wege für dich gangbar ist."
     },
     {
       q: "Müssen wir nachher über euch finanzieren?",
-      a: "Nein. Wir zeigen Ihnen Optionen auf. Ob Sie diese nutzen oder mit Ihrer Hausbank sprechen, entscheiden allein Sie. Wir sind stolz auf unsere Unabhängigkeit."
+      a: "Nein. Wir zeigen dir Optionen auf. Ob du diese nutzt oder mit deiner Hausbank sprichst, entscheidest allein du. Wir sind stolz auf unsere Unabhängigkeit."
     }
   ];
 
@@ -67,7 +71,7 @@ const FAQSection: React.FC = () => {
                   <button 
                     className="text-[#F87101] font-bold text-sm hover:underline"
                     data-event="faq_cta_click"
-                    onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}
+                    onClick={onStartCheck}
                   >
                     Situation kostenlos prüfen &rarr;
                   </button>

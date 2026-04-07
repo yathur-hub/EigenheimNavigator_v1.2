@@ -6,21 +6,6 @@ interface RealitySectionProps {
 }
 
 const RealitySection: React.FC<RealitySectionProps> = ({ onStartCheck }) => {
-  const cards = [
-    {
-      title: "Banken bewerten anders, als viele denken.",
-      text: "Ein hohes Einkommen allein reicht oft nicht. Die kalkulatorische Tragbarkeit und die Bewertung der Bank sind die eigentlichen Hürden."
-    },
-    {
-      title: "Eigenkapital ist nicht nur eine Zahl – sondern eine Strategie.",
-      text: "Wie man Vorsorgegelder und Ersparnisse kombiniert, entscheidet darüber, ob die Finanzierung überhaupt bewilligt wird."
-    },
-    {
-      title: "Timing entscheidet über Chancen und Verhandlung.",
-      text: "Wer erst sucht und dann die Finanzierung klärt, verliert gegen schnellere Käufer. Wir drehen diesen Prozess für Sie um."
-    }
-  ];
-
   return (
     <section id="how-it-works" className="py-12 sm:py-20 px-4 bg-white">
       <div className="max-w-7xl mx-auto">
@@ -32,18 +17,21 @@ const RealitySection: React.FC<RealitySectionProps> = ({ onStartCheck }) => {
             In der Schweiz ist der Markt für Eigenheime gnadenlos. Bankenlogik, steigende Zinsen und komplexe Tragbarkeitsrechnungen führen dazu, dass viele Interessenten jahrelang "blind" suchen und bei jedem Objekt eine Absage kassieren. Das ist frustrierend und kostet wertvolle Lebenszeit.
           </p>
           <p className="text-slate-600 leading-relaxed">
-            Unsere Aufgabe ist es, diese Blackbox zu öffnen. Wir geben Ihnen die nackte Wahrheit über Ihre Situation, damit Sie nicht auf Hoffnungen bauen, sondern auf Fakten. Nur wer seine Zahlen wirklich kennt, kann am Markt als seriöser Käufer auftreten.
+            Unsere Aufgabe ist es, diese Blackbox zu öffnen. Wir geben dir die nackte Wahrheit über deine Situation, damit du nicht auf Hoffnungen baust, sondern auf Fakten. Nur wer seine Zahlen wirklich kennt, kann am Markt als seriöser Käufer auftreten.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
-          {cards.map((card, idx) => (
-            <div key={idx} className="bg-white border border-slate-100 p-8 rounded-[20px] shadow-sm hover:shadow-md transition-shadow">
-              <div className="w-12 h-1 bg-[#F87101] mb-6"></div>
-              <h3 className="text-xl font-bold text-slate-900 mb-4">{card.title}</h3>
-              <p className="text-slate-600 leading-relaxed text-sm">{card.text}</p>
-            </div>
-          ))}
+        <div className="max-w-4xl mx-auto mb-16">
+          <div className="aspect-video rounded-[24px] overflow-hidden shadow-2xl border border-slate-100 bg-slate-50">
+            <iframe 
+              className="w-full h-full"
+              src="https://www.youtube.com/embed/ELibSv3mUSo?start=1" 
+              title="Eigenheim Navigator Video" 
+              frameBorder="0" 
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+              allowFullScreen
+            ></iframe>
+          </div>
         </div>
 
         <div className="flex justify-center">
@@ -52,7 +40,7 @@ const RealitySection: React.FC<RealitySectionProps> = ({ onStartCheck }) => {
             data-event="cta_primary_mid_click"
             onClick={onStartCheck}
           >
-            Meine Situation prüfen
+            Erstgespräch buchen
           </button>
         </div>
       </div>
