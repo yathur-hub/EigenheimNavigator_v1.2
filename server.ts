@@ -17,9 +17,14 @@ async function startServer() {
   app.post("/api/lead", async (req, res) => {
     const { formData, webhookData } = req.body;
 
+    let formspreeSuccess = false;
+    let webhookSuccess = false;
+    let formspreeError = "";
+    let webhookError = "";
+
     try {
       // 1. Send to Formspree
-      const formspreePromise = fetch('https://formspree.io/f/mojprwpw', {
+      const formspreeRes = await fetch('https://formspree.io/f/mojprwpw', {
         method: 'POST',
         headers: {
           'Accept': 'application/json',
@@ -27,28 +32,46 @@ async function startServer() {
         },
         body: JSON.stringify(formData)
       });
+      formspreeSuccess = formspreeRes.ok;
+      if (!formspreeRes.ok) {
+        formspreeError = await formspreeRes.text();
+      }
+    } catch (error: any) {
+      console.error('Error sending to Formspree:', error);
+      formspreeError = error?.message || String(error);
+    }
 
+    try {
       // 2. Send to Arilla Webhook
-      const webhookPromise = fetch('https://app.arilla.ch/tools/lead-json-webhook/form/535/7c0a1a580d31df63ed08d1ea9322031c', {
+      const webhookRes = await fetch('https://app.arilla.ch/tools/lead-json-webhook/form/535/7c0a1a580d31df63ed08d1ea9322031c', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(webhookData)
       });
-
-      const [formspreeRes, webhookRes] = await Promise.all([formspreePromise, webhookPromise]);
-
-      if (formspreeRes.ok || webhookRes.ok) {
-        res.status(200).json({ success: true });
-      } else {
-        const errText = await formspreeRes.text();
-        console.error('Submission failed:', errText);
-        res.status(500).json({ error: 'Submission failed' });
+      webhookSuccess = webhookRes.ok;
+      if (!webhookRes.ok) {
+        webhookError = await webhookRes.text();
       }
-    } catch (error) {
-      console.error('Server-side submission error:', error);
-      res.status(500).json({ error: 'Internal server error' });
+    } catch (error: any) {
+      console.error('Error sending to Arilla Webhook:', error);
+      webhookError = error?.message || String(error);
+    }
+
+    if (formspreeSuccess || webhookSuccess) {
+      res.status(200).json({ 
+        success: true, 
+        formspreeSuccess, 
+        webhookSuccess 
+      });
+    } else {
+      console.error('Submission failed entirely.', { formspreeError, webhookError });
+      res.status(500).json({ 
+        error: 'Submission failed', 
+        formspreeError, 
+        webhookError 
+      });
     }
   });
 
