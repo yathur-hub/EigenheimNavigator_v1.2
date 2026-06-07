@@ -63,7 +63,8 @@ const SocialProofSection: React.FC<SocialProofSectionProps> = ({ onStartCheck })
   const scroll = (direction: 'left' | 'right') => {
     if (scrollRef.current) {
       const { clientWidth } = scrollRef.current;
-      const scrollAmount = direction === 'left' ? -clientWidth * 0.8 : clientWidth * 0.8;
+      // Scroll by one full viewport width to better align with snapped cards
+      const scrollAmount = direction === 'left' ? -clientWidth : clientWidth;
       scrollRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
     }
   };
@@ -105,7 +106,7 @@ const SocialProofSection: React.FC<SocialProofSectionProps> = ({ onStartCheck })
         {/* Slider Container */}
         <div 
           ref={scrollRef}
-          className="flex gap-6 overflow-x-auto snap-x snap-mandatory pb-12 no-scrollbar scroll-smooth"
+          className="flex gap-4 sm:gap-6 overflow-x-auto snap-x snap-mandatory pb-12 no-scrollbar scroll-smooth"
         >
           {testimonials.map((t, idx) => (
             <motion.div 
@@ -114,9 +115,9 @@ const SocialProofSection: React.FC<SocialProofSectionProps> = ({ onStartCheck })
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: idx * 0.1 }}
-              className="min-w-[85vw] md:min-w-[400px] snap-start bg-white border border-slate-100 p-8 rounded-[32px] shadow-sm flex flex-col hover:shadow-xl transition-shadow duration-500"
+              className="min-w-[90vw] md:min-w-[400px] snap-center bg-white border border-slate-100 p-5 sm:p-8 rounded-[32px] shadow-sm flex flex-col hover:shadow-xl transition-shadow duration-500"
             >
-              <div className="aspect-video bg-slate-100 rounded-[24px] mb-8 overflow-hidden shadow-inner relative group">
+              <div className="aspect-video bg-slate-100 rounded-[20px] sm:rounded-[24px] mb-6 sm:mb-8 overflow-hidden shadow-inner relative group">
                 {t.videoId ? (
                   <iframe
                     className="absolute inset-0 w-full h-full"
@@ -136,7 +137,7 @@ const SocialProofSection: React.FC<SocialProofSectionProps> = ({ onStartCheck })
                 )}
               </div>
               <div className="flex-grow">
-                <p className="text-slate-700 italic mb-6 leading-relaxed text-lg">“{t.text}”</p>
+                <p className="text-slate-700 italic mb-6 leading-relaxed text-base sm:text-lg">“{t.text}”</p>
               </div>
               <div className="flex items-center gap-4 pt-6 border-t border-slate-50">
                 <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-bold text-sm">
