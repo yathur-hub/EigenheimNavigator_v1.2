@@ -164,11 +164,20 @@ const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onClose, title, su
             </div>
           </div>
 
-          <div className="pt-6 border-t border-slate-50">
+          <div className="pt-6 border-t border-slate-50 flex flex-col sm:flex-row gap-3">
+            {variant === 'modal' && onClose && (
+              <button 
+                type="button"
+                onClick={onClose}
+                className="order-2 sm:order-1 flex-1 border-2 border-slate-200 text-slate-500 py-4 rounded-xl font-bold text-lg hover:bg-slate-50 hover:text-slate-700 transition-all"
+              >
+                Abbrechen
+              </button>
+            )}
             <button 
               onClick={() => setModalView('contact')}
               disabled={!formData.firstname || !formData.lastname}
-              className="w-full bg-blue-600 text-white py-4 sm:py-5 rounded-xl sm:rounded-[20px] font-black text-lg shadow-xl shadow-blue-200 hover:bg-blue-700 transition-all disabled:opacity-40"
+              className={`order-1 sm:order-2 ${variant === 'modal' && onClose ? 'flex-[2]' : 'w-full'} bg-blue-600 text-white py-4 sm:py-5 rounded-xl sm:rounded-[20px] font-black text-lg shadow-xl shadow-blue-200 hover:bg-blue-700 transition-all disabled:opacity-40`}
             >
               Weiter
             </button>

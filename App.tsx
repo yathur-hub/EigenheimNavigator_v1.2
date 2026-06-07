@@ -60,8 +60,8 @@ const App: React.FC = () => {
                   <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">Persönliche Beratung</p>
                 </div>
               </div>
-              <button onClick={closeModal} className="p-2 bg-slate-50 rounded-full text-slate-400 hover:text-slate-600 transition-colors">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" /></svg>
+              <button onClick={closeModal} aria-label="Schliessen" className="w-11 h-11 bg-slate-100 hover:bg-slate-200 active:scale-95 rounded-full text-slate-600 hover:text-slate-900 flex items-center justify-center transition-all cursor-pointer">
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" /></svg>
               </button>
             </div>
 
