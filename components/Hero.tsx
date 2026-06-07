@@ -22,7 +22,7 @@ const Hero: React.FC<HeroProps> = ({ onStartCheck }) => {
               </p>
             </div>
 
-            <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 pt-4">
+            <div className="flex flex-col items-start gap-4 pt-4">
               <button 
                 className="w-full sm:w-auto bg-blue-600 text-white px-6 sm:px-10 py-4 sm:py-5 rounded-xl sm:rounded-[20px] font-black text-base sm:text-lg shadow-xl shadow-blue-200 hover:bg-blue-700 transition-all hover:scale-[1.02] active:scale-[0.98]"
                 data-event="check_start"
@@ -30,6 +30,12 @@ const Hero: React.FC<HeroProps> = ({ onStartCheck }) => {
               >
                 Erstgespräch buchen
               </button>
+              <div className="inline-flex items-center gap-2 bg-rose-50 border border-rose-200 text-rose-700 px-4 py-2 rounded-xl text-xs font-semibold shadow-sm">
+                <svg className="w-3.5 h-3.5 text-rose-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                </svg>
+                <span>Nur selbstbewohnte Wohnobjekte, keine Renditeobjekte</span>
+              </div>
             </div>
 
             <div className="space-y-6 pt-4">
