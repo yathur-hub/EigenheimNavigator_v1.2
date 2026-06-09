@@ -19,13 +19,13 @@ const Home: React.FC<HomeProps> = ({ onStartCheck }) => {
   return (
     <>
       <Hero onStartCheck={onStartCheck} />
-      <LogoSlider />
       <SocialProofSection onStartCheck={onStartCheck} />
       <RealitySection onStartCheck={onStartCheck} />
       <SolutionSection onStartCheck={onStartCheck} />
       <ProcessSection onStartCheck={onStartCheck} />
       <PartnerSection onStartCheck={onStartCheck} />
       <TeamSection onStartCheck={onStartCheck} />
+      <LogoSlider />
       <FAQSection onStartCheck={onStartCheck} />
       <ContactSection />
     </>

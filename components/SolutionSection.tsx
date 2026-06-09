@@ -8,16 +8,16 @@ interface SolutionSectionProps {
 const SolutionSection: React.FC<SolutionSectionProps> = ({ onStartCheck }) => {
   const outcomes = [
     {
-      title: "Realistische Finanzierungsanalyse",
-      text: "Wir klären, was Banken dir effektiv bewilligen. Inklusive Tragbarkeit, benötigtem Eigenkapital und deinem maximalen Kaufpreis-Spielraum."
+      title: "Klarheit über eure echte Ausgangslage",
+      text: "Ihr wisst genau, was drinliegt, wo eure Grenzen sind und was ihr verbessern könnt. Das gibt euch Sicherheit, bevor ihr euch in ein Objekt verliebt oder unnötig Zeit mit falschen Immobilien verliert."
     },
     {
-      title: "Klare Kaufstrategie",
-      text: "Wann ist der beste Kaufzeitpunkt für dich? Wir definieren Prioritäten, optimieren deine Suchstrategie und bereiten dich auf Verhandlungen vor."
+      title: "Sicher begleitet durch den Kaufprozess",
+      text: "Ihr habt jemanden an eurer Seite, der den Weg kennt. Von der Besichtigung bis zum Kaufvertrag erkennt ihr Stolperfallen früher, verhandelt besser vorbereitet und trefft Entscheidungen mit deutlich mehr Ruhe."
     },
     {
-      title: "Zugang zu Partnern",
-      text: "Wenn es Sinn macht, bringen wir dich direkt mit den richtigen Finanzierungspartnern zusammen – für konkrete Angebote statt vager Versprechen."
+      title: "Ein Plan, der auch nach dem Kauf hält",
+      text: "Euer Eigenheim soll nicht nur gekauft, sondern auch sorgenfrei getragen werden können. Deshalb planen wir mit euch auch die Zeit nach dem Einzug: Budget, Unterhalt, Renovationen, Absicherung, Vorsorge und Steuern."
     }
   ];
 
@@ -27,7 +27,7 @@ const SolutionSection: React.FC<SolutionSectionProps> = ({ onStartCheck }) => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center mb-12 sm:mb-16">
           <div>
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900 mb-6 leading-tight">
-              Wir zeigen nicht nur Möglichkeiten – wir sagen dir ehrlich, ob es funktioniert.
+              Wir zeigen nicht nur Möglichkeiten – wir sagen dir ehrlich, wie es funktioniert.
             </h2>
             <p className="text-slate-600 mb-6 leading-relaxed">
               Standardberatungen gibt es wie Sand am Meer. Wir konzentrieren uns auf das Wesentliche: dein Ergebnis. Nach unserem Austausch weisst du nicht nur theoretisch, wie Hypotheken funktionieren, sondern du hast einen Plan für dein eigenes Projekt in der Hand.

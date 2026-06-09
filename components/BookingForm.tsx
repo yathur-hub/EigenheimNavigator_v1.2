@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 
-type ModalStep = 'name' | 'contact' | 'object' | 'timeframe' | 'submit';
+type ModalStep = 'object' | 'timeframe' | 'name' | 'contact' | 'submit';
 
 interface BookingFormProps {
   onSuccess?: () => void;
@@ -13,7 +13,7 @@ interface BookingFormProps {
 }
 
 const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onClose, title, subtitle, variant = 'inline' }) => {
-  const [modalView, setModalView] = useState<ModalStep>('name');
+  const [modalView, setModalView] = useState<ModalStep>('object');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   
@@ -22,10 +22,44 @@ const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onClose, title, su
     lastname: '',
     email: '',
     phone: '',
+    street: '',
+    zip: '',
+    city: '',
+    birthdate: '',
     hasObject: '',
     purchaseTimeframe: '',
     privacyAccepted: false
   });
+
+  const isEmailValid = (val: string): boolean => {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
+  };
+
+  const isSwissPhoneValid = (val: string): boolean => {
+    const cleaned = val.replace(/[^\d+]/g, '');
+    if (cleaned.startsWith('+41')) {
+      return /^\+41[1-9]\d{8}$/.test(cleaned);
+    }
+    if (cleaned.startsWith('0041')) {
+      return /^0041[1-9]\d{8}$/.test(cleaned);
+    }
+    if (cleaned.startsWith('0')) {
+      return /^0[1-9]\d{8}$/.test(cleaned);
+    }
+    return false;
+  };
+
+  const isZipValid = (val: string): boolean => {
+    return /^\d{4}$/.test(val);
+  };
+
+  const isBirthdateValid = (val: string): boolean => {
+    if (!val) return false;
+    const d = new Date(val);
+    if (isNaN(d.getTime())) return false;
+    const year = d.getFullYear();
+    return year <= 2026 && year >= 1900;
+  };
 
   const track = (event: string, data?: any) => {
     console.log(`Tracking: ${event}`, data || '');
@@ -42,9 +76,9 @@ const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onClose, title, su
       "name": `${formData.firstname} ${formData.lastname}`.trim(),
       "vorname": formData.firstname,
       "nachname": formData.lastname,
-      "geburtsdatum": "", // Not currently in form
-      "plz": "",          // Not currently in form
-      "ort": "",          // Not currently in form
+      "geburtsdatum": formData.birthdate, // mapped
+      "plz": formData.zip,                // mapped
+      "ort": formData.city,               // mapped
       "email": formData.email,
       "telefon": formData.phone,
       "habt_ihr_bereits_objekt": formData.hasObject,
@@ -67,11 +101,12 @@ const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onClose, title, su
         track('form_submit_success', { formData, webhookData });
         if (onSuccess) onSuccess();
       } else {
-        throw new Error('Submission failed');
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || 'Submission failed');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Submission error:', error);
-      alert('Es gab ein Problem beim Absenden. Bitte versuchen Sie es später erneut oder kontaktieren Sie uns direkt.');
+      alert(error?.message || 'Es gab ein Problem beim Absenden. Bitte versuchen Sie es später erneut oder kontaktieren Sie uns direkt.');
     } finally {
       setIsSubmitting(false);
     }
@@ -118,127 +153,27 @@ const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onClose, title, su
             className="h-full bg-blue-600 transition-all duration-700 ease-out" 
             style={{ 
               width: 
-                modalView === 'name' ? '20%' : 
-                modalView === 'contact' ? '40%' : 
-                modalView === 'object' ? '60%' : 
-                modalView === 'timeframe' ? '80%' : '100%' 
+                modalView === 'object' ? '20%' : 
+                modalView === 'timeframe' ? '40%' : 
+                modalView === 'name' ? '60%' : 
+                modalView === 'contact' ? '80%' : '100%' 
             }}
           ></div>
         </div>
         <span className="text-[10px] font-black text-blue-600 uppercase tabular-nums">
-          {modalView === 'name' ? 'Schritt 1/5' : 
-           modalView === 'contact' ? 'Schritt 2/5' : 
-           modalView === 'object' ? 'Schritt 3/5' : 
-           modalView === 'timeframe' ? 'Schritt 4/5' : 'Schritt 5/5'}
+          {modalView === 'object' ? 'Schritt 1/5' : 
+           modalView === 'timeframe' ? 'Schritt 2/5' : 
+           modalView === 'name' ? 'Schritt 3/5' : 
+           modalView === 'contact' ? 'Schritt 4/5' : 'Schritt 5/5'}
         </span>
       </div>
 
-      {/* STEP 1: Name */}
-      {modalView === 'name' && (
-        <div className="animate-fade-in space-y-8">
-          <div className="space-y-2">
-            <h3 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight leading-tight">Wie dürfen wir dich ansprechen?</h3>
-            <p className="text-slate-500 text-xs sm:text-sm">Gib uns deinen Namen für eine persönliche Beratung.</p>
-          </div>
-
-          <div className="space-y-5">
-            <div className="space-y-2">
-              <label className="text-[10px] font-black text-slate-900 uppercase tracking-widest">Vorname</label>
-              <input 
-                type="text" 
-                placeholder="Max"
-                className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl p-3 sm:p-4 text-sm font-bold focus:border-blue-600 outline-none"
-                value={formData.firstname}
-                onChange={(e) => setFormData({...formData, firstname: e.target.value})}
-              />
-            </div>
-            <div className="space-y-2">
-              <label className="text-[10px] font-black text-slate-900 uppercase tracking-widest">Nachname</label>
-              <input 
-                type="text" 
-                placeholder="Mustermann"
-                className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl p-3 sm:p-4 text-sm font-bold focus:border-blue-600 outline-none"
-                value={formData.lastname}
-                onChange={(e) => setFormData({...formData, lastname: e.target.value})}
-              />
-            </div>
-          </div>
-
-          <div className="pt-6 border-t border-slate-50 flex flex-col sm:flex-row gap-3">
-            {variant === 'modal' && onClose && (
-              <button 
-                type="button"
-                onClick={onClose}
-                className="order-2 sm:order-1 flex-1 border-2 border-slate-200 text-slate-500 py-4 rounded-xl font-bold text-lg hover:bg-slate-50 hover:text-slate-700 transition-all"
-              >
-                Abbrechen
-              </button>
-            )}
-            <button 
-              onClick={() => setModalView('contact')}
-              disabled={!formData.firstname || !formData.lastname}
-              className={`order-1 sm:order-2 ${variant === 'modal' && onClose ? 'flex-[2]' : 'w-full'} bg-blue-600 text-white py-4 sm:py-5 rounded-xl sm:rounded-[20px] font-black text-lg shadow-xl shadow-blue-200 hover:bg-blue-700 transition-all disabled:opacity-40`}
-            >
-              Weiter
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* STEP 2: Contact */}
-      {modalView === 'contact' && (
-        <div className="animate-fade-in space-y-8">
-          <div className="space-y-2">
-            <h3 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight leading-tight">Wie erreichen wir dich?</h3>
-            <p className="text-slate-500 text-xs sm:text-sm">Deine Daten werden vertraulich behandelt.</p>
-          </div>
-
-          <div className="space-y-5">
-            <div className="space-y-2">
-              <label className="text-[10px] font-black text-slate-900 uppercase tracking-widest">E-Mail-Adresse</label>
-              <input 
-                type="email" 
-                placeholder="beispiel@mail.ch"
-                className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl p-3 sm:p-4 text-sm font-bold focus:border-blue-600 outline-none"
-                value={formData.email}
-                onChange={(e) => setFormData({...formData, email: e.target.value})}
-              />
-            </div>
-            <div className="space-y-2">
-              <label className="text-[10px] font-black text-slate-900 uppercase tracking-widest">Telefonnummer</label>
-              <input 
-                type="tel" 
-                placeholder="+41 79 123 45 67"
-                className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl p-3 sm:p-4 text-sm font-bold focus:border-blue-600 outline-none"
-                value={formData.phone}
-                onChange={(e) => setFormData({...formData, phone: e.target.value})}
-              />
-            </div>
-          </div>
-
-          <div className="pt-6 border-t border-slate-50 flex gap-3">
-            <button 
-              onClick={() => setModalView('name')}
-              className="flex-1 border-2 border-slate-100 text-slate-400 py-4 rounded-xl font-black text-lg hover:bg-slate-50 transition-all"
-            >
-              Zurück
-            </button>
-            <button 
-              onClick={() => setModalView('object')}
-              disabled={!formData.email || !formData.phone}
-              className="flex-[2] bg-blue-600 text-white py-4 rounded-xl font-black text-lg shadow-xl shadow-blue-200 hover:bg-blue-700 transition-all disabled:opacity-40"
-            >
-              Weiter
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* STEP 3: Object */}
+      {/* STEP 1: Object */}
       {modalView === 'object' && (
         <div className="animate-fade-in space-y-8">
           <div className="space-y-2">
-            <h3 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight leading-tight">Habt ihr bereits ein konkretes Objekt gefunden?</h3>
+            <h3 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight leading-tight">Habt ihr bereits ein konkretes Objekt gefunden?*</h3>
+            <p className="text-slate-500 text-xs sm:text-sm">Wähle die passende Option aus.</p>
           </div>
 
           <div className="space-y-3">
@@ -265,22 +200,26 @@ const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onClose, title, su
             ))}
           </div>
 
-          <div className="pt-6 border-t border-slate-50">
-            <button 
-              onClick={() => setModalView('contact')}
-              className="w-full border-2 border-slate-100 text-slate-400 py-4 rounded-xl font-black text-lg hover:bg-slate-50 transition-all"
-            >
-              Zurück
-            </button>
-          </div>
+          {variant === 'modal' && onClose && (
+            <div className="pt-6 border-t border-slate-50">
+              <button 
+                type="button"
+                onClick={onClose}
+                className="w-full border-2 border-slate-200 text-slate-500 py-4 rounded-xl font-bold text-lg hover:bg-slate-50 hover:text-slate-700 transition-all"
+              >
+                Abbrechen
+              </button>
+            </div>
+          )}
         </div>
       )}
 
-      {/* STEP 4: Timeframe */}
+      {/* STEP 2: Timeframe */}
       {modalView === 'timeframe' && (
         <div className="animate-fade-in space-y-8">
           <div className="space-y-2">
-            <h3 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight leading-tight">Wann möchtet ihr euer Eigenheim kaufen?</h3>
+            <h3 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight leading-tight">Wann möchtet ihr euer Eigenheim kaufen?*</h3>
+            <p className="text-slate-500 text-xs sm:text-sm">Deine Angabe hilft uns bei der zeitlichen Einordnung.</p>
           </div>
 
           <div className="space-y-3">
@@ -294,7 +233,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onClose, title, su
                 key={opt}
                 onClick={() => {
                   setFormData({...formData, purchaseTimeframe: opt});
-                  setModalView('submit');
+                  setModalView('name');
                 }}
                 className={`w-full p-4 rounded-xl border-2 text-left transition-all ${
                   formData.purchaseTimeframe === opt 
@@ -318,12 +257,192 @@ const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onClose, title, su
         </div>
       )}
 
+      {/* STEP 3: Name & Geburtsdatum */}
+      {modalView === 'name' && (
+        <div className="animate-fade-in space-y-8">
+          <div className="space-y-2">
+            <h3 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight leading-tight">Wie dürfen wir dich ansprechen?</h3>
+            <p className="text-slate-500 text-xs sm:text-sm">Gib uns deinen vollständigen Namen und dein Geburtsdatum an.</p>
+          </div>
+
+          <div className="space-y-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-slate-900 uppercase tracking-widest">Vorname*</label>
+                <input 
+                  type="text" 
+                  placeholder="Max"
+                  className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl p-3 sm:p-4 text-sm font-bold focus:border-blue-600 outline-none"
+                  value={formData.firstname}
+                  onChange={(e) => setFormData({...formData, firstname: e.target.value})}
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-slate-900 uppercase tracking-widest">Nachname*</label>
+                <input 
+                  type="text" 
+                  placeholder="Mustermann"
+                  className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl p-3 sm:p-4 text-sm font-bold focus:border-blue-600 outline-none"
+                  value={formData.lastname}
+                  onChange={(e) => setFormData({...formData, lastname: e.target.value})}
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-[10px] font-black text-slate-900 uppercase tracking-widest">Geburtsdatum*</label>
+              <input 
+                type="date" 
+                className={`w-full bg-slate-50 border-2 rounded-xl p-3 sm:p-4 text-sm font-bold outline-none focus:border-blue-600 ${
+                  formData.birthdate && !isBirthdateValid(formData.birthdate)
+                    ? 'border-rose-400 focus:border-rose-500'
+                    : 'border-slate-100'
+                }`}
+                value={formData.birthdate}
+                onChange={(e) => setFormData({...formData, birthdate: e.target.value})}
+              />
+              {formData.birthdate && !isBirthdateValid(formData.birthdate) && (
+                <p className="text-rose-600 text-xs font-bold mt-1">Das Geburtsjahr darf nicht nach 2026 liegen und muss eine plausible Angabe sein.</p>
+              )}
+            </div>
+          </div>
+
+          <div className="pt-6 border-t border-slate-50 flex gap-3">
+            <button 
+              onClick={() => setModalView('timeframe')}
+              className="flex-1 border-2 border-slate-100 text-slate-400 py-4 rounded-xl font-black text-lg hover:bg-slate-50 transition-all"
+            >
+              Zurück
+            </button>
+            <button 
+              onClick={() => setModalView('contact')}
+              disabled={!formData.firstname || !formData.lastname || !isBirthdateValid(formData.birthdate)}
+              className="flex-[2] bg-blue-600 text-white py-4 rounded-xl font-black text-lg shadow-xl shadow-blue-200 hover:bg-blue-700 transition-all disabled:opacity-40"
+            >
+              Weiter
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* STEP 4: Address & Contact */}
+      {modalView === 'contact' && (
+        <div className="animate-fade-in space-y-8">
+          <div className="space-y-2">
+            <h3 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight leading-tight">Wie erreichen wir dich?</h3>
+            <p className="text-slate-500 text-xs sm:text-sm">Bitte gib deine Adresse und Kontaktdaten an.</p>
+          </div>
+
+          <div className="space-y-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-slate-900 uppercase tracking-widest">E-Mail-Adresse*</label>
+                <input 
+                  type="email" 
+                  placeholder="beispiel@mail.ch"
+                  className={`w-full bg-slate-50 border-2 rounded-xl p-3 sm:p-4 text-sm font-bold outline-none focus:border-blue-600 ${
+                    formData.email && !isEmailValid(formData.email)
+                      ? 'border-rose-400 focus:border-rose-500'
+                      : 'border-slate-100'
+                  }`}
+                  value={formData.email}
+                  onChange={(e) => setFormData({...formData, email: e.target.value})}
+                />
+                {formData.email && !isEmailValid(formData.email) && (
+                  <p className="text-rose-600 text-xs font-bold mt-1">Bitte gib eine gültige E-Mail-Adresse ein (z.B. name@beispiel.ch).</p>
+                )}
+              </div>
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-slate-900 uppercase tracking-widest">Telefonnummer*</label>
+                <input 
+                  type="tel" 
+                  placeholder="+41 79 123 45 67"
+                  className={`w-full bg-slate-50 border-2 rounded-xl p-3 sm:p-4 text-sm font-bold outline-none focus:border-blue-600 ${
+                    formData.phone && !isSwissPhoneValid(formData.phone)
+                      ? 'border-rose-400 focus:border-rose-500'
+                      : 'border-slate-100'
+                  }`}
+                  value={formData.phone}
+                  onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                />
+                {formData.phone && !isSwissPhoneValid(formData.phone) && (
+                  <p className="text-rose-600 text-xs font-bold mt-1">Strikte Schweizer Nummer verlangt (z.B. +41 79 123 45 67 oder 079 123 45 67).</p>
+                )}
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-[10px] font-black text-slate-900 uppercase tracking-widest">Strasse und Hausnummer*</label>
+              <input 
+                type="text" 
+                placeholder="Bahnhofstrasse 12"
+                className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl p-3 sm:p-4 text-sm font-bold focus:border-blue-600 outline-none"
+                value={formData.street}
+                onChange={(e) => setFormData({...formData, street: e.target.value})}
+              />
+            </div>
+
+            <div className="grid grid-cols-3 gap-4">
+              <div className="space-y-2 col-span-1">
+                <label className="text-[10px] font-black text-slate-900 uppercase tracking-widest">PLZ*</label>
+                <input 
+                  type="text" 
+                  placeholder="8000"
+                  className={`w-full bg-slate-50 border-2 rounded-xl p-3 sm:p-4 text-sm font-bold outline-none focus:border-blue-600 ${
+                    formData.zip && !isZipValid(formData.zip)
+                      ? 'border-rose-400 focus:border-rose-500'
+                      : 'border-slate-100'
+                  }`}
+                  value={formData.zip}
+                  onChange={(e) => setFormData({...formData, zip: e.target.value})}
+                />
+                {formData.zip && !isZipValid(formData.zip) && (
+                  <p className="text-rose-600 text-xs font-bold mt-1">Muss genau 4 Ziffern sein.</p>
+                )}
+              </div>
+              <div className="space-y-2 col-span-2">
+                <label className="text-[10px] font-black text-slate-900 uppercase tracking-widest">Ort*</label>
+                <input 
+                  type="text" 
+                  placeholder="Zürich"
+                  className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl p-3 sm:p-4 text-sm font-bold focus:border-blue-600 outline-none"
+                  value={formData.city}
+                  onChange={(e) => setFormData({...formData, city: e.target.value})}
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="pt-6 border-t border-slate-50 flex gap-3">
+            <button 
+              onClick={() => setModalView('name')}
+              className="flex-1 border-2 border-slate-100 text-slate-400 py-4 rounded-xl font-black text-lg hover:bg-slate-50 transition-all"
+            >
+              Zurück
+            </button>
+            <button 
+              onClick={() => setModalView('submit')}
+              disabled={
+                !isEmailValid(formData.email) || 
+                !isSwissPhoneValid(formData.phone) || 
+                !formData.street || 
+                !isZipValid(formData.zip) || 
+                !formData.city
+              }
+              className="flex-[2] bg-blue-600 text-white py-4 rounded-xl font-black text-lg shadow-xl shadow-blue-200 hover:bg-blue-700 transition-all disabled:opacity-40"
+            >
+              Weiter
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* STEP 5: Submit */}
       {modalView === 'submit' && (
         <div className="animate-fade-in space-y-8">
           <div className="space-y-2">
             <h3 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight leading-tight">Fast geschafft!</h3>
-            <p className="text-slate-500 text-xs sm:text-sm">Bestätige deine Anfrage für das Erstgespräch.</p>
+            <p className="text-slate-500 text-xs sm:text-sm">Bestätige deine Angaben für das Erstgespräch.</p>
           </div>
 
           <div className="space-y-6">
@@ -333,16 +452,24 @@ const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onClose, title, su
                 <span className="text-slate-900 font-black">{formData.firstname} {formData.lastname}</span>
               </div>
               <div className="flex justify-between text-xs">
+                <span className="text-slate-400 font-bold uppercase">Geburtsdatum</span>
+                <span className="text-slate-900 font-black">{formData.birthdate}</span>
+              </div>
+              <div className="flex justify-between text-xs">
                 <span className="text-slate-400 font-bold uppercase">Kontakt</span>
-                <span className="text-slate-900 font-black">{formData.email}</span>
+                <span className="text-slate-900 font-black">{formData.email} / {formData.phone}</span>
+              </div>
+              <div className="flex justify-between text-xs">
+                <span className="text-slate-400 font-bold uppercase">Adresse</span>
+                <span className="text-slate-900 font-black truncate max-w-[150px] sm:max-w-none">{formData.street}, {formData.zip} {formData.city}</span>
               </div>
               <div className="flex justify-between text-xs">
                 <span className="text-slate-400 font-bold uppercase">Objekt</span>
-                <span className="text-slate-900 font-black truncate max-w-[150px]">{formData.hasObject}</span>
+                <span className="text-slate-900 font-black truncate max-w-[150px] sm:max-w-none">{formData.hasObject}</span>
               </div>
               <div className="flex justify-between text-xs">
                 <span className="text-slate-400 font-bold uppercase">Zeitraum</span>
-                <span className="text-slate-900 font-black truncate max-w-[150px]">{formData.purchaseTimeframe}</span>
+                <span className="text-slate-900 font-black truncate max-w-[150px] sm:max-w-none">{formData.purchaseTimeframe}</span>
               </div>
             </div>
 
@@ -376,7 +503,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onClose, title, su
               ) : 'Abschicken'}
             </button>
             <button 
-              onClick={() => setModalView('timeframe')}
+              onClick={() => setModalView('contact')}
               disabled={isSubmitting}
               className="w-full text-slate-400 text-[10px] font-black uppercase tracking-[0.2em] hover:text-slate-600 transition-colors disabled:opacity-20"
             >
