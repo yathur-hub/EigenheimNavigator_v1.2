@@ -68,9 +68,15 @@ const Footer: React.FC = () => {
 
         <div className="pt-8 border-t border-slate-800 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-slate-500">
           <p>&copy; {new Date().getFullYear()} Mission13 GmbH. Alle Rechte vorbehalten.</p>
-          <div className="flex space-x-6">
+          <div className="flex flex-wrap gap-x-6 gap-y-2 justify-center md:justify-end">
             <Link to="/impressum" className="hover:text-white transition-colors">Impressum</Link>
             <Link to="/datenschutz" className="hover:text-white transition-colors">Datenschutz</Link>
+            <button 
+              onClick={() => window.dispatchEvent(new Event('open-cookie-banner'))}
+              className="hover:text-white transition-colors cursor-pointer bg-transparent border-0 p-0 text-slate-500 font-normal outline-none text-xs"
+            >
+              Cookie-Einstellungen
+            </button>
           </div>
         </div>
       </div>

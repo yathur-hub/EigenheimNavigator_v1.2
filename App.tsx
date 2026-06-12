@@ -7,6 +7,7 @@ import Home from './src/pages/Home';
 import Impressum from './src/pages/Impressum';
 import Privacy from './src/pages/Privacy';
 import BookingForm from './components/BookingForm';
+import CookieConsent from './components/CookieConsent';
 
 import { Link } from 'react-router-dom';
 
@@ -43,6 +44,7 @@ const App: React.FC = () => {
         </main>
 
         <Footer />
+        <CookieConsent />
         
         {/* OPTIMIZED REALITÄTSCHECK MODAL */}
         {isModalOpen && (

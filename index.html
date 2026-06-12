@@ -2,6 +2,37 @@
 <!DOCTYPE html>
 <html lang="de-CH">
 <head>
+    <!-- Google Consent Mode v2 Default -->
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        
+        var consentSettings = {
+          'analytics_storage': 'denied',
+          'ad_storage': 'denied',
+          'ad_user_data': 'denied',
+          'ad_personalization': 'denied',
+          'functionality_storage': 'granted',
+          'security_storage': 'granted'
+        };
+
+        try {
+          var stored = localStorage.getItem('cookieConsent');
+          if (stored) {
+            var parsed = JSON.parse(stored);
+            if (parsed) {
+              consentSettings.analytics_storage = parsed.analytics ? 'granted' : 'denied';
+              consentSettings.ad_storage = parsed.marketing ? 'granted' : 'denied';
+              consentSettings.ad_user_data = parsed.marketing ? 'granted' : 'denied';
+              consentSettings.ad_personalization = parsed.marketing ? 'granted' : 'denied';
+            }
+          }
+        } catch (e) {
+          console.error('[Consent] Error reading stored consent', e);
+        }
+
+        gtag('consent', 'default', consentSettings);
+    </script>
     <!-- Google Tag Manager -->
     <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
     new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
