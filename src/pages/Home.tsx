@@ -6,6 +6,7 @@ import RealitySection from '../../components/RealitySection';
 import SolutionSection from '../../components/SolutionSection';
 import SocialProofSection from '../../components/SocialProofSection';
 import ProcessSection from '../../components/ProcessSection';
+import GlossarySection from '../../components/GlossarySection';
 import PartnerSection from '../../components/PartnerSection';
 import TeamSection from '../../components/TeamSection';
 import FAQSection from '../../components/FAQSection';
@@ -23,6 +24,7 @@ const Home: React.FC<HomeProps> = ({ onStartCheck }) => {
       <RealitySection onStartCheck={onStartCheck} />
       <SolutionSection onStartCheck={onStartCheck} />
       <ProcessSection onStartCheck={onStartCheck} />
+      <GlossarySection onStartCheck={onStartCheck} />
       <PartnerSection onStartCheck={onStartCheck} />
       <TeamSection onStartCheck={onStartCheck} />
       <LogoSlider />

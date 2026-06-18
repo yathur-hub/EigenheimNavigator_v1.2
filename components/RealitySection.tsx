@@ -25,7 +25,7 @@ const RealitySection: React.FC<RealitySectionProps> = ({ onStartCheck }) => {
           <div className="aspect-video rounded-[24px] overflow-hidden shadow-2xl border border-slate-100 bg-slate-50">
             <iframe 
               className="w-full h-full"
-              src="https://www.youtube.com/embed/ELibSv3mUSo?start=1" 
+              src="https://www.youtube.com/embed/RQxJJReNv7I?rel=0" 
               title="Eigenheim Navigator Video" 
               frameBorder="0" 
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 

@@ -81,7 +81,7 @@ const Hero: React.FC<HeroProps> = ({ onStartCheck }) => {
             >
               <iframe
                 className="absolute inset-0 w-full h-full"
-                src="https://www.youtube.com/embed/dkVAfWfe4oU?rel=0"
+                src="https://www.youtube.com/embed/vVioptejOHM?rel=0"
                 title="Eigenheim Navigator Video"
                 frameBorder="0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
