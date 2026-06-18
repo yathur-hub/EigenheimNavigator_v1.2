@@ -58,8 +58,8 @@ const App: React.FC = () => {
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-xs shadow-lg">CH</div>
                 <div>
-                  <h2 className="text-lg font-extrabold text-slate-900 leading-none">Erstgespräch buchen</h2>
-                  <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">Persönliche Beratung</p>
+                  <h2 className="text-lg font-extrabold text-slate-900 leading-none">Eigenheim-Realitätscheck</h2>
+                  <p className="text-[10px] text-slate-450 font-black uppercase tracking-widest mt-1">Kostenlos & Unverbindlich</p>
                 </div>
               </div>
               <button onClick={closeModal} aria-label="Schliessen" className="w-11 h-11 bg-slate-100 hover:bg-slate-200 active:scale-95 rounded-full text-slate-600 hover:text-slate-900 flex items-center justify-center transition-all cursor-pointer">

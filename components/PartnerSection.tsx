@@ -54,7 +54,7 @@ const PartnerSection: React.FC<PartnerSectionProps> = ({ onStartCheck }) => {
         <div className="flex flex-col items-center gap-6">
           <p className="text-slate-400 text-sm font-bold uppercase tracking-[0.2em]">Echte Menschen, echte Situationen – keine Show.</p>
           <button 
-            className="bg-[#2663EB] text-white px-10 py-5 rounded-[16px] font-bold text-xl shadow-xl hover:bg-blue-700 transition-all hover:scale-[1.02] active:scale-[0.98]"
+            className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 sm:py-4.5 rounded-2xl font-black text-center text-sm sm:text-base shadow-xl transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
             data-event="cta_primary_gallery_click"
             onClick={onStartCheck}
           >

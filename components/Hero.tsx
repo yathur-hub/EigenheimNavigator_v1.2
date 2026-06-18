@@ -13,28 +13,55 @@ const Hero: React.FC<HeroProps> = ({ onStartCheck }) => {
           
           {/* Left Column: Copy */}
           <div className="space-y-8 animate-fade-in order-2 lg:order-1">
-            <div className="space-y-6">
-              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-extrabold text-slate-900 leading-[0.95] tracking-tighter">
-                Dein Weg zum Eigenheim – <span className="text-blue-600">einfach & klar.</span>
+            <div className="space-y-4">
+              <div className="inline-flex items-center gap-2 px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-[10px] md:text-xs font-black uppercase tracking-widest border border-blue-100">
+                <span>Kostenloser Eigenheim-Realitätscheck</span>
+              </div>
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-[54px] font-extrabold text-slate-900 leading-[1.05] tracking-tight">
+                Finde heraus, ob dein Eigenheim in der Ostschweiz realistisch ist.
               </h1>
-              <p className="text-base sm:text-lg md:text-xl text-slate-600 font-medium leading-relaxed max-w-lg">
-                Buche dein kostenloses Erstgespräch und erhalte eine ehrliche Einordnung zu deinem Vorhaben.
+              <p className="text-sm sm:text-base md:text-lg text-slate-600 font-medium leading-relaxed max-w-xl">
+                Im kostenlosen Eigenheim-Realitätscheck erhältst du eine ehrliche Einschätzung zu deiner Ausgangslage, deiner Finanzierungsfähigkeit und den nächsten sinnvollen Schritten.
               </p>
             </div>
 
-            <div className="flex flex-col items-start gap-4 pt-4">
-              <button 
-                className="w-full sm:w-auto bg-blue-600 text-white px-6 sm:px-10 py-4 sm:py-5 rounded-xl sm:rounded-[20px] font-black text-base sm:text-lg shadow-xl shadow-blue-200 hover:bg-blue-700 transition-all hover:scale-[1.02] active:scale-[0.98]"
-                data-event="check_start"
-                onClick={onStartCheck}
-              >
-                Erstgespräch buchen
-              </button>
-              <div className="inline-flex items-center gap-2 bg-rose-50 border border-rose-200 text-rose-700 px-4 py-2 rounded-xl text-xs font-semibold shadow-sm">
-                <svg className="w-3.5 h-3.5 text-rose-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                </svg>
-                <span>Nur selbstbewohnte Wohnobjekte, keine Renditeobjekte</span>
+            <div className="space-y-5">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full">
+                <button 
+                  className="w-full sm:w-auto bg-blue-600 text-white px-6 sm:px-8 py-4 sm:py-4.5 rounded-2xl font-black text-center text-sm sm:text-base shadow-xl shadow-blue-200 hover:bg-blue-700 transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
+                  data-event="check_start"
+                  onClick={onStartCheck}
+                >
+                  Kostenlosen Realitätscheck starten
+                </button>
+                <a 
+                  href="#ablauf"
+                  className="w-full sm:w-auto text-center border-2 border-slate-100 hover:border-blue-200 bg-white text-slate-700 hover:text-blue-600 px-6 sm:px-8 py-4 sm:py-4.5 rounded-2xl font-black text-sm sm:text-base transition-all hover:scale-[1.02] active:scale-[0.98]"
+                >
+                  Ablauf ansehen
+                </a>
+              </div>
+
+              {/* Trust-Hinweise directly below the CTAs */}
+              <div className="flex flex-col sm:flex-row sm:items-center gap-x-5 gap-y-2 pt-2 text-xs font-bold text-slate-500">
+                <div className="flex items-center gap-1.5">
+                  <svg className="w-4 h-4 text-emerald-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="3">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                  <span>Kostenlos und unverbindlich</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <svg className="w-4 h-4 text-emerald-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="3">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                  <span>Für Eigenheim-Interessierte in der Ostschweiz</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <svg className="w-4 h-4 text-emerald-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="3">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                  <span>Ehrliche Einschätzung statt Verkaufsdruck</span>
+                </div>
               </div>
             </div>
 

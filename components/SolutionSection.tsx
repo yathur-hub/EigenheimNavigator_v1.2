@@ -38,7 +38,7 @@ const SolutionSection: React.FC<SolutionSectionProps> = ({ onStartCheck }) => {
 
             <div className="hidden sm:flex flex-col items-start gap-4 mt-10">
               <button 
-                className="w-full sm:w-auto bg-[#2663EB] text-white px-8 py-4 rounded-[14px] font-bold text-lg hover:bg-blue-700 transition-all"
+                className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 sm:py-4.5 rounded-2xl font-black text-center text-sm sm:text-base shadow-xl transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
                 data-event="cta_primary_click"
                 onClick={onStartCheck}
               >

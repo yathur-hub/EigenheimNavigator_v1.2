@@ -447,22 +447,49 @@ const videos: VideoItem[] = [
   }
 ];
 
+const getMappedCategory = (video: { title: string; category: string }): string => {
+  const titleLower = video.title.toLowerCase();
+  
+  if (titleLower.includes("eigenkapital") || titleLower.includes("eigengeld") || titleLower.includes("eigenmittel") || titleLower.includes("vorsorgebezug") || titleLower.includes("erbvorbezug") || titleLower.includes("säule") || titleLower.includes("kapital")) {
+    return "Eigenkapital";
+  }
+  if (titleLower.includes("tragbarkeit") || titleLower.includes("einkommen") || titleLower.includes("bonität") || titleLower.includes("leisten") || titleLower.includes("tragbar")) {
+    return "Tragbarkeit";
+  }
+  if (video.category === "Fehler & Risiken" || titleLower.includes("fehler") || titleLower.includes("falle") || titleLower.includes("risiko") || titleLower.includes("albtraum") || titleLower.includes("problem")) {
+    return "Fehler vermeiden";
+  }
+  if (video.category === "Einstieg ins Eigenheim" || titleLower.includes("timing") || titleLower.includes("zeitpunkt") || titleLower.includes("vorbereitung") || titleLower.includes("fahrplan") || titleLower.includes("schritt") || titleLower.includes("start")) {
+    return "Timing & Planung";
+  }
+  if (video.category === "Finanzierung & Bank" || video.category === "Hypothek, Zinsen & Steuern" || titleLower.includes("hypothek") || titleLower.includes("zins") || titleLower.includes("bank") || titleLower.includes("finanzierung")) {
+    return "Finanzierung & Hypothek";
+  }
+  if (video.category === "Kaufprozess & Übergabe" || titleLower.includes("kaufprozess") || titleLower.includes("vertrag") || titleLower.includes("notar") || titleLower.includes("übergabe")) {
+    return "Kaufprozess";
+  }
+  return "Objekt & Entscheidung";
+};
+
 const categories = [
   "Alle Videos",
-  "Einstieg ins Eigenheim",
-  "Finanzierung & Bank",
-  "Hypothek, Zinsen & Steuern",
-  "Kaufprozess & Übergabe",
-  "Fehler & Risiken",
-  "Vorsorge, Recht & Familie",
-  "Neubau & Bauleitung",
-  "Junge Paare & Familien",
-  "Kundengeschichten"
+  "Eigenkapital",
+  "Finanzierung & Hypothek",
+  "Tragbarkeit",
+  "Kaufprozess",
+  "Fehler vermeiden",
+  "Timing & Planung",
+  "Objekt & Entscheidung"
 ];
 
-// Deduplicate any video entries with identical (title & url & category) combinations if needed,
-// but let's keep the provided array clean.
-const uniqueVideos = Array.from(new Set(videos.map(v => JSON.stringify(v)))).map(s => JSON.parse(s) as VideoItem);
+// Deduplicate and map categories to the new conversion-friendly categories
+const uniqueVideos = Array.from(new Set(videos.map(v => JSON.stringify(v)))).map(s => {
+  const parsed = JSON.parse(s) as VideoItem;
+  return {
+    ...parsed,
+    category: getMappedCategory(parsed)
+  };
+});
 
 const getYoutubeVideoId = (url: string): string | null => {
   const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
@@ -520,17 +547,17 @@ const GlossarySection: React.FC<GlossarySectionProps> = ({ onStartCheck }) => {
         <div className="max-w-3xl mx-auto text-center mb-12 sm:mb-16">
           <div className="inline-flex items-center gap-2 px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-black uppercase tracking-widest mb-6 border border-blue-100 shadow-sm animate-fade-in">
             <BookOpen size={14} className="text-blue-600" />
-            <span>Wissen & Expertise</span>
+            <span>Wissen & Expertise (Ostschweiz)</span>
           </div>
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-slate-900 mb-6 leading-tight select-none">
-            Wissens-Glossar rund um den Eigenheimkauf
+            Wissen, das dir vor dem Eigenheimkauf hilft
           </h2>
           <div className="h-1.5 bg-[#F87101] w-20 mx-auto rounded-full mb-8"></div>
-          <p className="text-slate-600 font-medium leading-relaxed text-sm sm:text-base">
-            Der Weg ins Eigenheim wirft many Fragen auf: Finanzierung, Eigenmittel, Bankgespräche, Hypotheken, Verträge, Vorsorge und rechtliche Absicherung. In unserem Wissens-Glossar findest du kompakte Videos zu den wichtigsten Themen rund um den Eigenheimkauf in der Schweiz.
+          <p className="text-slate-650 font-medium leading-relaxed text-sm sm:text-base md:text-lg">
+            Bevor du eine grosse finanzielle Entscheidung triffst, solltest du die wichtigsten Grundlagen verstehen. Im Wissens-Glossar findest du kurze Inhalte zu Eigenkapital, Tragbarkeit, Hypothek, Kaufprozess und typischen Fehlern beim Eigenheimkauf.
           </p>
           <p className="text-slate-500 font-semibold text-xs sm:text-sm mt-4 italic">
-            Nutze die Filter, um genau die Inhalte zu finden, die zu deiner aktuellen Situation passen.
+            Nutze die Filter, um genau die Videos zu finden, die zu deiner aktuellen Situation passen.
           </p>
         </div>
 
@@ -702,30 +729,30 @@ const GlossarySection: React.FC<GlossarySectionProps> = ({ onStartCheck }) => {
         )}
 
         {/* CTA-Element */}
-        <div className="max-w-4xl mx-auto relative overflow-hidden bg-slate-900 text-white rounded-[32px] p-8 sm:p-12 md:p-14 shadow-2xl shadow-blue-900/10">
-          <div className="absolute top-0 right-0 w-80 h-80 bg-blue-600/10 rounded-full blur-3xl" />
-          <div className="absolute bottom-0 left-0 w-80 h-80 bg-[#F87101]/10 rounded-full blur-3xl" />
+        <div className="max-w-4xl mx-auto relative overflow-hidden bg-slate-900 text-white rounded-[32px] p-8 sm:p-12 md:p-14 shadow-2xl shadow-blue-900/10 mt-16">
+          <div className="absolute top-0 right-0 w-80 h-80 bg-blue-600/10 rounded-full blur-3xl opacity-60" />
+          <div className="absolute bottom-0 left-0 w-80 h-80 bg-[#F87101]/10 rounded-full blur-3xl opacity-60" />
           
           <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8 md:gap-12">
             <div className="flex-1 space-y-4 text-center md:text-left">
-              <div className="inline-flex items-center gap-1.5 bg-blue-50/10 text-blue-200 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border border-blue-50/10">
-                <Sparkles size={12} className="text-amber-400" />
-                <span>Exklusiv für dich</span>
+              <div className="inline-flex items-center gap-1.5 bg-[#F87101]/10 text-[#F87101] px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border border-[#F87101]/20">
+                <Sparkles size={12} className="text-[#F87101]" />
+                <span>Nächster Schritt</span>
               </div>
               <h3 className="text-2xl sm:text-3xl font-black leading-tight text-white">
-                Du möchtest wissen, ob dein Eigenheim realistisch ist?
+                Du möchtest wissen, was das konkret für deine Situation bedeutet?
               </h3>
-              <p className="text-slate-400 font-medium leading-relaxed text-sm sm:text-base">
-                Dann starte nicht mit Vermutungen, sondern mit einer sauberen Einschätzung deiner Situation.
+              <p className="text-slate-450 font-medium leading-relaxed text-sm">
+                Starte nicht mit riskantem Halbwissen oder Bauchgefühl. Lass uns deine individuelle Ausgangslage in der Ostschweiz strukturiert einordnen.
               </p>
             </div>
             
-            <div className="flex-shrink-0 w-full sm:w-auto">
+            <div className="flex-shrink-0 w-full md:w-auto">
               <button
                 onClick={onStartCheck}
-                className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-black text-base py-5 px-10 rounded-2xl shadow-xl shadow-blue-950 transition-all hover:scale-103 active:scale-98 flex items-center justify-center gap-2"
+                className="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white font-black text-center text-sm sm:text-base py-4 py-4.5 px-8 rounded-2xl shadow-xl shadow-blue-950/20 transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
               >
-                Kostenloses Erstgespräch buchen
+                Realitätscheck starten
               </button>
             </div>
           </div>

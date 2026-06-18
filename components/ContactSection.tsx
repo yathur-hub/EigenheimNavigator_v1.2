@@ -1,16 +1,14 @@
-
-import React, { useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
-
 import BookingForm from './BookingForm';
 
 const ContactSection: React.FC = () => {
   return (
-    <section id="contact" className="py-12 sm:py-24 px-4 bg-slate-50">
+    <section id="contact" className="py-12 sm:py-24 px-4 bg-slate-50 relative">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-12 sm:mb-16 max-w-2xl mx-auto">
-          <h2 className="text-2xl sm:text-3xl md:text-5xl font-bold text-slate-900 mb-6 leading-tight">Finde heraus, ob dein Eigenheim realistisch ist.</h2>
-          <p className="text-base sm:text-lg text-slate-600">Verliere keine Zeit mehr mit Suchen ohne Gewissheit. Wir helfen dir, Klarheit zu gewinnen und Chancen zu nutzen.</p>
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-slate-900 mb-6 leading-tight">Starte deinen kostenlosen Eigenheim-Realitätscheck</h2>
+          <p className="text-base sm:text-lg text-slate-650 font-medium">Beantworte wenige Fragen, damit wir deine Ausgangslage sinnvoll einschätzen können. Je genauer deine Angaben, desto konkreter wird dein Erstgespräch.</p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12 lg:gap-20">
@@ -20,7 +18,6 @@ const ContactSection: React.FC = () => {
           </div>
 
           {/* Right: Trust Box */}
-
           <div className="flex flex-col justify-center">
             <div className="bg-white p-8 rounded-[24px] border border-gray-100 shadow-sm relative">
               <div className="absolute -top-6 -right-6 w-24 h-24 bg-[#F87101] rounded-full flex items-center justify-center text-white text-center p-2 transform rotate-12 shadow-lg">
@@ -62,7 +59,7 @@ const ContactSection: React.FC = () => {
                 href="https://www.google.com/search?q=mission+13&sca_esv=68dd12cce3572cd1&sxsrf=ANbL-n7GnYnqLxrx2peeTniue77CYhX_Lg%3A1777961850493&ei=eov5aYDjHZyli-gPgaiJwAU&biw=2560&bih=1210&ved=0ahUKEwiAiJeEwKGUAxWc0gIHHQFUAlgQ4dUDCBE&uact=5&oq=mission+13&gs_lp=Egxnd3Mtd2l6LXNlcnAiCm1pc3Npb24gMTMyCxAuGK8BGMcBGIAEMgUQABiABDIGEAAYFhgeMgYQABgWGB4yBhAAGBYYHjIGEAAYFhgeMgYQABgWGB4yBhAAGBYYHjIGEAAYFhgeMgYQABgWGB4yGhAuGK8BGMcBGIAEGJcFGNwEGN4EGOAE2AECSP8KUMoHWMoHcAF4AZABAJgBXKABXKoBATG4AQPIAQD4AQGYAgKgAmLCAgoQABhHGNYEGLADwgINEAAYgAQYigUYQxiwA8ICFxAuGNwGGLgGGNoGGNgCGMgDGLAD2AEBmAMAiAYBkAYNugYECAEYGboGBggCEAEYFJIHATKgB6MIsgcBMbgHX8IHAzAuMsgHBYAIAQ&sclient=gws-wiz-serp#lrd=0x479aeb40d83a929f:0x9511e8ffc914af69,1,,,,"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="mt-12 pt-8 border-t border-slate-50 flex items-center gap-4 hover:opacity-80 transition-opacity"
+                className="mt-12 pt-8 border-t border-slate-100 flex items-center gap-4 hover:opacity-80 transition-opacity"
                 data-event="google_reviews_click"
               >
                 <div className="text-3xl font-black text-slate-900">4.9</div>

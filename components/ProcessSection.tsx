@@ -22,7 +22,7 @@ const ProcessSection: React.FC<ProcessSectionProps> = ({ onStartCheck }) => {
   ];
 
   return (
-    <section className="py-12 sm:py-24 px-4 bg-slate-900 text-white overflow-hidden">
+    <section id="ablauf" className="py-12 sm:py-24 px-4 bg-slate-900 text-white overflow-hidden">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-12 sm:mb-20">
           <h2 className="text-2xl sm:text-3xl md:text-5xl font-bold mb-6 leading-tight">So kommst du zu deinem Eigenheim – in 3 Schritten.</h2>
@@ -48,7 +48,7 @@ const ProcessSection: React.FC<ProcessSectionProps> = ({ onStartCheck }) => {
 
         <div className="mt-20 flex flex-col items-center justify-center gap-4">
           <button 
-            className="bg-[#2663EB] text-white px-10 py-5 rounded-[16px] font-bold text-xl shadow-2xl hover:bg-blue-700 transition-all hover:scale-105"
+            className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 sm:py-4.5 rounded-2xl font-black text-center text-sm sm:text-base shadow-xl transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
             data-event="cta_primary_process_click"
             onClick={onStartCheck}
           >

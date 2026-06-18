@@ -151,7 +151,7 @@ const SocialProofSection: React.FC<SocialProofSectionProps> = ({ onStartCheck })
 
         <div className="mt-12 flex flex-col items-center justify-center gap-4">
            <button 
-            className="bg-[#2663EB] text-white px-12 py-5 rounded-2xl font-black text-lg shadow-xl hover:bg-blue-700 hover:-translate-y-1 transition-all active:scale-95"
+            className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 sm:py-4.5 rounded-2xl font-black text-center text-sm sm:text-base shadow-xl transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
             onClick={onStartCheck}
           >
             Erstgespräch buchen

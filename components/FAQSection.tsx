@@ -41,7 +41,7 @@ const FAQSection: React.FC<FAQSectionProps> = ({ onStartCheck }) => {
     },
     {
       q: "Müssen wir nachher über euch finanzieren?",
-      a: "Nein. Wir zeigen dir Optionen auf. Ob du diese nutzt oder mit deiner Hausbank sprichst, entscheidest allein du. Wir sind stolz auf unsere Unabhängigkeit.",
+      a: "Idealerweise ja, da wir so das Beste für dich herausholen. Wir arbeiten mit rund 30 Partnern zusammen, die uns vergüten – das macht unseren Service für dich kostengünstig. Liefert deine Hausbank oder ein anderes Institut am Ende doch das bessere Angebot, fragen wir dort für dich an.",
       cta: "Unabhängigen Check starten"
     }
   ];
