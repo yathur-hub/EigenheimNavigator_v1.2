@@ -5,6 +5,8 @@ import BookingForm from './BookingForm';
 const ContactSection: React.FC = () => {
   return (
     <section id="contact" className="py-12 sm:py-24 px-4 bg-slate-50 relative">
+      <div id="realitaetscheck" className="absolute -top-[100px] left-0"></div>
+      <div id="formular" className="absolute -top-[100px] left-0"></div>
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-12 sm:mb-16 max-w-2xl mx-auto">
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-slate-900 mb-6 leading-tight">Starte deinen kostenlosen Eigenheim-Realitätscheck</h2>

@@ -13,6 +13,7 @@ import PartnerSection from '../../components/PartnerSection';
 import TeamSection from '../../components/TeamSection';
 import FAQSection from '../../components/FAQSection';
 import ContactSection from '../../components/ContactSection';
+import Reveal from '../../components/Reveal';
 
 interface HomeProps {
   onStartCheck: () => void;
@@ -21,19 +22,57 @@ interface HomeProps {
 const Home: React.FC<HomeProps> = ({ onStartCheck }) => {
   return (
     <>
-      <Hero onStartCheck={onStartCheck} />
-      <SocialProofSection onStartCheck={onStartCheck} />
-      <ProblemSection onStartCheck={onStartCheck} />
-      <TargetGroupSection onStartCheck={onStartCheck} />
-      <SolutionSection onStartCheck={onStartCheck} />
-      <ProcessSection onStartCheck={onStartCheck} />
-      <TrustSection onStartCheck={onStartCheck} />
-      <GlossarySection onStartCheck={onStartCheck} />
-      <PartnerSection onStartCheck={onStartCheck} />
-      <TeamSection onStartCheck={onStartCheck} />
-      <LogoSlider />
-      <FAQSection onStartCheck={onStartCheck} />
-      <ContactSection />
+      <Reveal className="w-full" delay={0}>
+        <Hero onStartCheck={onStartCheck} />
+      </Reveal>
+      
+      <Reveal className="w-full" delay={100}>
+        <SocialProofSection onStartCheck={onStartCheck} />
+      </Reveal>
+      
+      <Reveal className="w-full" delay={50}>
+        <ProblemSection onStartCheck={onStartCheck} />
+      </Reveal>
+      
+      <Reveal className="w-full" delay={50}>
+        <TargetGroupSection onStartCheck={onStartCheck} />
+      </Reveal>
+      
+      <Reveal className="w-full" delay={50}>
+        <SolutionSection onStartCheck={onStartCheck} />
+      </Reveal>
+      
+      <Reveal className="w-full" delay={50}>
+        <ProcessSection onStartCheck={onStartCheck} />
+      </Reveal>
+      
+      <Reveal className="w-full" delay={50}>
+        <TrustSection onStartCheck={onStartCheck} />
+      </Reveal>
+      
+      <Reveal className="w-full" delay={50}>
+        <GlossarySection onStartCheck={onStartCheck} />
+      </Reveal>
+      
+      <Reveal className="w-full" delay={50}>
+        <PartnerSection onStartCheck={onStartCheck} />
+      </Reveal>
+      
+      <Reveal className="w-full" delay={50}>
+        <TeamSection onStartCheck={onStartCheck} />
+      </Reveal>
+      
+      <Reveal className="w-full" delay={50}>
+        <LogoSlider />
+      </Reveal>
+      
+      <Reveal className="w-full" delay={50}>
+        <FAQSection onStartCheck={onStartCheck} />
+      </Reveal>
+      
+      <Reveal className="w-full" delay={50}>
+        <ContactSection />
+      </Reveal>
     </>
   );
 };
