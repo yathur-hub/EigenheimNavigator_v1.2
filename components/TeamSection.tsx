@@ -17,7 +17,7 @@ const TeamSection: React.FC<TeamSectionProps> = ({ onStartCheck }) => {
               <img 
                 src="https://raw.githubusercontent.com/yathur-hub/EHN-Brandassets/main/Unbenannt%20-%2001.%20April%202026%20um%2008.23.54.png" 
                 alt="Eigenheim Navigator Team" 
-                className="relative w-full h-auto rounded-[24px] shadow-2xl object-cover aspect-[4/3] lg:aspect-auto"
+                className="relative w-full h-auto rounded-[24px] shadow-2xl"
                 referrerPolicy="no-referrer"
               />
             </div>
