@@ -118,18 +118,15 @@ export default async function handler(
   }
 
   // Webhook URLs (Active and fallback destinations)
-  const webhookUrl = process.env.WEBHOOK_URL || 'https://example.com/webhook/eigenheimnavi';
-  const arillaWebhookUrl = process.env.ARILLA_WEBHOOK_URL || 'https://app.arilla.ch/tools/lead-json-webhook/form/535/7c0a1a580d31df63ed08d1ea9322031c';
+  const webhookUrl = process.env.WEBHOOK_URL || 'https://mis13.app.n8n.cloud/webhook-test/7ff9cd84-6980-459a-8109-12799c07d4cb';
   const formspreeUrl = process.env.FORMSPREE_URL || 'https://formspree.io/f/mojprwpw';
 
-  console.log(`[Vercel API Lead] Dispatching lead to Webhook (${webhookUrl}), Arilla (${arillaWebhookUrl}) and Formspree (${formspreeUrl})`);
+  console.log(`[Vercel API Lead] Dispatching lead to Webhook (${webhookUrl}) and Formspree (${formspreeUrl})`);
 
   let webhookSuccess = false;
-  let arillaSuccess = false;
   let formspreeSuccess = false;
 
   let webhookErrorText = '';
-  let arillaErrorText = '';
   let formspreeErrorText = '';
 
   // 1. Send complete detailed JSON payload to primary CRM / Automation Webhook
@@ -151,44 +148,7 @@ export default async function handler(
     webhookErrorText = error?.message || String(error);
   }
 
-  // 2. Fallbacks: Send to Arilla (using standardized format)
-  const arillaPayload = {
-    "Geschlecht": "",
-    "Gender": "",
-    "name": `${contact.first_name} ${contact.last_name}`.trim(),
-    "vorname": contact.first_name,
-    "nachname": contact.last_name,
-    "geburtsdatum": regional_profile.age_range || "",
-    "plz": regional_profile.zip_code,
-    "ort": regional_profile.canton,
-    "email": contact.email,
-    "telefon": contact.phone,
-    "habt_ihr_bereits_objekt": property_goal.goal,
-    "welche_region_eigenheim": Array.isArray(regional_profile.preferred_region) ? regional_profile.preferred_region.join(', ') : "",
-    "was_erwartet_eigenheim_navigator": property_goal.buying_timeline,
-    "documents": [],
-    "lead_score": lead_evaluation?.lead_score || 0,
-    "lead_quality": lead_evaluation?.lead_quality || "C"
-  };
-
-  try {
-    const arillaResponse = await fetch(arillaWebhookUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(arillaPayload)
-    });
-    arillaSuccess = arillaResponse.ok;
-    if (!arillaSuccess) {
-      arillaErrorText = await arillaResponse.text();
-    }
-  } catch (error: any) {
-    console.error('[Vercel API Lead] Error sending to Arilla Webhook:', error);
-    arillaErrorText = error?.message || String(error);
-  }
-
-  // 3. Fallbacks: Send to Formspree for reliable email backup delivery
+  // 2. Fallbacks: Send to Formspree for reliable email backup delivery
   try {
     const formspreeResponse = await fetch(formspreeUrl, {
       method: 'POST',
@@ -208,18 +168,16 @@ export default async function handler(
   }
 
   // Return success if at least one submission succeeded
-  if (webhookSuccess || arillaSuccess || formspreeSuccess) {
+  if (webhookSuccess || formspreeSuccess) {
     return res.status(200).json({
       success: true,
       webhookSuccess,
-      arillaSuccess,
       formspreeSuccess
     });
   } else {
     return res.status(500).json({
       error: 'Übermittlung im Hintergrund fehlgeschlagen.',
       webhookError: webhookErrorText,
-      arillaError: arillaErrorText,
       formspreeError: formspreeErrorText
     });
   }
