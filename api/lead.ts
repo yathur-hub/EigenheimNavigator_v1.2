@@ -10,36 +10,53 @@ export default async function handler(
     return res.status(405).json({ error: `Method ${req.method} not allowed` });
   }
 
-  const { formData, webhookData: clientWebhookData } = req.body || {};
+  const payload = req.body || {};
 
-  // Log incoming submission (without logging sensitive info if not needed, but metadata is good)
-  console.log('[Vercel API Lead] Received post request with body keys:', Object.keys(req.body || {}));
+  console.log('[Vercel API Lead] Received post request with body keys:', Object.keys(payload));
 
-  // Validate required fields
-  if (
-    !formData || 
-    !formData.email || 
-    !formData.firstname || 
-    !formData.lastname ||
-    !formData.phone ||
-    !formData.street ||
-    !formData.zip ||
-    !formData.city ||
-    !formData.birthdate ||
-    !formData.hasObject ||
-    !formData.purchaseTimeframe
-  ) {
-    console.error('[Vercel API Lead] Validation failed: Missing required fields', { formData });
-    return res.status(400).json({ 
-      error: 'All fields (firstname, lastname, email, phone, street, zip, city, birthdate, hasObject, purchaseTimeframe) are mandatory.' 
+  const {
+    form_id,
+    lead_source,
+    contact,
+    property_goal,
+    financial_situation,
+    regional_profile,
+    consultation,
+    consents,
+    tracking,
+    lead_evaluation
+  } = payload;
+
+  // Validate presence of standard request containers
+  if (!contact || !property_goal || !financial_situation || !regional_profile || !consultation || !consents) {
+    console.error('[Vercel API Lead] Validation failed: Missing payload containers');
+    return res.status(400).json({
+      error: 'Ungültige Payload-Struktur. Datencontainer fehlen.'
     });
   }
 
-  // Validate formatting/integrity
-  const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email);
-  
+  // Validate personal contact fields
+  if (
+    !contact.first_name || contact.first_name.trim().length < 2 ||
+    !contact.last_name || contact.last_name.trim().length < 2 ||
+    !contact.email ||
+    !contact.phone ||
+    !consents.privacy_consent
+  ) {
+    console.error('[Vercel API Lead] Validation failed: Invalid contact fields or missing privacy consent', { contact, consents });
+    return res.status(400).json({
+      error: 'Vorname, Nachname, E-Mail-Adresse und Telefonnummer sind erforderlich. Die Datenschutzerklärung muss bestätigt werden.'
+    });
+  }
+
+  // Email format validation
+  const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contact.email);
+  if (!isEmailValid) {
+    return res.status(400).json({ error: 'Bitte geben Sie eine gültige E-Mail-Adresse ein.' });
+  }
+
   // Swiss phone validation
-  const cleanedPhone = formData.phone.replace(/[^\d+]/g, '');
+  const cleanedPhone = contact.phone.replace(/[^\d+]/g, '');
   let isPhoneValid = false;
   if (cleanedPhone.startsWith('+41')) {
     isPhoneValid = /^\+41[1-9]\d{8}$/.test(cleanedPhone);
@@ -47,64 +64,131 @@ export default async function handler(
     isPhoneValid = /^0041[1-9]\d{8}$/.test(cleanedPhone);
   } else if (cleanedPhone.startsWith('0')) {
     isPhoneValid = /^0[1-9]\d{8}$/.test(cleanedPhone);
+  } else {
+    // Basic fallback for other numbers to be resilient
+    isPhoneValid = cleanedPhone.length >= 8;
   }
 
-  // 4-digit zip validation
-  const isZipValid = /^\d{4}$/.test(formData.zip);
-
-  // Birthdate year validation: <= 2026 and >= 1900
-  let isBirthdateValid = false;
-  if (formData.birthdate) {
-    const d = new Date(formData.birthdate);
-    if (!isNaN(d.getTime())) {
-      const year = d.getFullYear();
-      isBirthdateValid = year <= 2026 && year >= 1900;
-    }
-  }
-
-  if (!isEmailValid) {
-    return res.status(400).json({ error: 'Ungültiges E-Mail-Format.' });
-  }
   if (!isPhoneValid) {
-    return res.status(400).json({ error: 'Ungültige Schweizer Telefonnummer. Akzeptiert werden z.B. +41 79 123 45 67 oder 079 123 45 67.' });
-  }
-  if (!isZipValid) {
-    return res.status(400).json({ error: 'Die Postleitzahl muss eine 4-stellige Nummer sein.' });
-  }
-  if (!isBirthdateValid) {
-    return res.status(400).json({ error: 'Das Geburtsdatum ist ungültig oder das Jahr liegt nach 2026.' });
+    return res.status(400).json({ error: 'Bitte geben Sie eine gültige Telefonnummer ein.' });
   }
 
-  // Construct the standardized, exact JSON payload for Arilla Webhook
-  const standardizedWebhookData = {
-    "Geschlecht": formData.gender || formData.Geschlecht || "", // Accept if exists or empty
-    "Gender": formData.gender || formData.Gender || "",
-    "name": `${formData.firstname} ${formData.lastname}`.trim(),
-    "vorname": formData.firstname,
-    "nachname": formData.lastname,
-    "geburtsdatum": formData.birthdate || formData.geburtsdatum || "",
-    "plz": formData.zip || formData.plz || "",
-    "ort": formData.city || formData.ort || "",
-    "email": formData.email,
-    "telefon": formData.phone || "",
-    "habt_ihr_bereits_objekt": formData.hasObject || formData.habt_ihr_bereits_objekt || "",
-    "welche_region_eigenheim": formData.region || formData.welche_region_eigenheim || "",
-    "was_erwartet_eigenheim_navigator": formData.purchaseTimeframe || formData.was_erwartet_eigenheim_navigator || "",
-    "documents": formData.documents || [] // Ensures always an array, fallback to default []
+  // ZIP Code validation (exactly 4 digits)
+  const isZipValid = /^\d{4}$/.test(regional_profile.zip_code || '');
+  if (!isZipValid) {
+    return res.status(400).json({ error: 'Bitte geben Sie eine gültige Schweizer Postleitzahl ein.' });
+  }
+
+  // Required Single Select & Multi Select validation
+  if (!property_goal.goal) {
+    return res.status(400).json({ error: 'Zielauswahl für das Eigenheim ist ein Pflichtfeld.' });
+  }
+  if (!property_goal.property_type || !Array.isArray(property_goal.property_type) || property_goal.property_type.length === 0) {
+    return res.status(400).json({ error: 'Bitte wählen Sie mindestens eine Art von Eigenheim aus.' });
+  }
+  if (!property_goal.buying_timeline) {
+    return res.status(400).json({ error: 'Zeitraumauswahl ist ein Pflichtfeld.' });
+  }
+  if (!financial_situation.employment_status) {
+    return res.status(400).json({ error: 'Erwerbssituation ist ein Pflichtfeld.' });
+  }
+  if (!financial_situation.own_funds_range) {
+    return res.status(400).json({ error: 'Angabe zum Eigenkapital ist ein Pflichtfeld.' });
+  }
+  if (!financial_situation.financing_status) {
+    return res.status(400).json({ error: 'Angabe zum Finanzierungsstatus ist ein Pflichtfeld.' });
+  }
+  if (!regional_profile.canton) {
+    return res.status(400).json({ error: 'Angabe zum aktuellen Kanton ist ein Pflichtfeld.' });
+  }
+  if (!regional_profile.preferred_region || !Array.isArray(regional_profile.preferred_region) || regional_profile.preferred_region.length === 0) {
+    return res.status(400).json({ error: 'Bitte wählen Sie mindestens eine bevorzugte Region aus.' });
+  }
+  if (!regional_profile.age_range) {
+    return res.status(400).json({ error: 'Altersangabe ist ein Pflichtfeld.' });
+  }
+  if (!regional_profile.current_situation) {
+    return res.status(400).json({ error: 'Angabe zur aktuellen Wohnsituation ist ein Pflichtfeld.' });
+  }
+  if (!consultation.consultation_interest) {
+    return res.status(400).json({ error: 'Information über Beratungsinteresse ist ein Pflichtfeld.' });
+  }
+  if (!consultation.contact_preference) {
+    return res.status(400).json({ error: 'Bitte wählen Sie eine bevorzugte Kontaktmethode aus.' });
+  }
+
+  // Webhook URLs (Active and fallback destinations)
+  const webhookUrl = process.env.WEBHOOK_URL || 'https://example.com/webhook/eigenheimnavi';
+  const arillaWebhookUrl = process.env.ARILLA_WEBHOOK_URL || 'https://app.arilla.ch/tools/lead-json-webhook/form/535/7c0a1a580d31df63ed08d1ea9322031c';
+  const formspreeUrl = process.env.FORMSPREE_URL || 'https://formspree.io/f/mojprwpw';
+
+  console.log(`[Vercel API Lead] Dispatching lead to Webhook (${webhookUrl}), Arilla (${arillaWebhookUrl}) and Formspree (${formspreeUrl})`);
+
+  let webhookSuccess = false;
+  let arillaSuccess = false;
+  let formspreeSuccess = false;
+
+  let webhookErrorText = '';
+  let arillaErrorText = '';
+  let formspreeErrorText = '';
+
+  // 1. Send complete detailed JSON payload to primary CRM / Automation Webhook
+  try {
+    const webhookResponse = await fetch(webhookUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload)
+    });
+    webhookSuccess = webhookResponse.ok;
+    if (!webhookSuccess) {
+      webhookErrorText = await webhookResponse.text();
+      console.error('[Vercel API Lead] Primary Webhook error status:', webhookResponse.status, webhookErrorText);
+    }
+  } catch (error: any) {
+    console.error('[Vercel API Lead] Error sending to primary Webhook:', error);
+    webhookErrorText = error?.message || String(error);
+  }
+
+  // 2. Fallbacks: Send to Arilla (using standardized format)
+  const arillaPayload = {
+    "Geschlecht": "",
+    "Gender": "",
+    "name": `${contact.first_name} ${contact.last_name}`.trim(),
+    "vorname": contact.first_name,
+    "nachname": contact.last_name,
+    "geburtsdatum": regional_profile.age_range || "",
+    "plz": regional_profile.zip_code,
+    "ort": regional_profile.canton,
+    "email": contact.email,
+    "telefon": contact.phone,
+    "habt_ihr_bereits_objekt": property_goal.goal,
+    "welche_region_eigenheim": Array.isArray(regional_profile.preferred_region) ? regional_profile.preferred_region.join(', ') : "",
+    "was_erwartet_eigenheim_navigator": property_goal.buying_timeline,
+    "documents": [],
+    "lead_score": lead_evaluation?.lead_score || 0,
+    "lead_quality": lead_evaluation?.lead_quality || "C"
   };
 
-  // Resolve target endpoints from environment variables or use the fallback defaults
-  const formspreeUrl = process.env.FORMSPREE_URL || 'https://formspree.io/f/mojprwpw';
-  const arillaWebhookUrl = process.env.ARILLA_WEBHOOK_URL || 'https://app.arilla.ch/tools/lead-json-webhook/form/535/7c0a1a580d31df63ed08d1ea9322031c';
+  try {
+    const arillaResponse = await fetch(arillaWebhookUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(arillaPayload)
+    });
+    arillaSuccess = arillaResponse.ok;
+    if (!arillaSuccess) {
+      arillaErrorText = await arillaResponse.text();
+    }
+  } catch (error: any) {
+    console.error('[Vercel API Lead] Error sending to Arilla Webhook:', error);
+    arillaErrorText = error?.message || String(error);
+  }
 
-  console.log(`[Vercel API Lead] Dispatching lead to Formspree (${formspreeUrl}) and Arilla Webhook (${arillaWebhookUrl})`);
-
-  let formspreeSuccess = false;
-  let webhookSuccess = false;
-  let formspreeError = '';
-  let webhookError = '';
-
-  // 1. Dispatch to Formspree
+  // 3. Fallbacks: Send to Formspree for reliable email backup delivery
   try {
     const formspreeResponse = await fetch(formspreeUrl, {
       method: 'POST',
@@ -112,59 +196,31 @@ export default async function handler(
         'Accept': 'application/json',
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(formData)
+      body: JSON.stringify(payload)
     });
-
     formspreeSuccess = formspreeResponse.ok;
-    if (!formspreeResponse.ok) {
-      formspreeError = await formspreeResponse.text();
-      console.error('[Vercel API Lead] Formspree responded with error status:', formspreeResponse.status, formspreeError);
-    } else {
-      console.log('[Vercel API Lead] Formspree submission successful');
+    if (!formspreeSuccess) {
+      formspreeErrorText = await formspreeResponse.text();
     }
   } catch (error: any) {
-    console.error('[Vercel API Lead] Error posting to Formspree:', error);
-    formspreeError = error?.message || String(error);
+    console.error('[Vercel API Lead] Error sending to Formspree:', error);
+    formspreeErrorText = error?.message || String(error);
   }
 
-  // 2. Dispatch to Arilla Webhook
-  try {
-    const webhookResponse = await fetch(arillaWebhookUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(standardizedWebhookData)
-    });
-
-    webhookSuccess = webhookResponse.ok;
-    if (!webhookResponse.ok) {
-      webhookError = await webhookResponse.text();
-      console.error('[Vercel API Lead] Arilla Webhook responded with error status:', webhookResponse.status, webhookError);
-    } else {
-      console.log('[Vercel API Lead] Arilla Webhook submission successful');
-    }
-  } catch (error: any) {
-    console.error('[Vercel API Lead] Error posting to Arilla Webhook:', error);
-    webhookError = error?.message || String(error);
-  }
-
-  // Handle Response logic according to requirements
-  // "200 wenn mindestens ein Lead-Ziel erfolgreich war"
-  // "500 wenn beide externen Services fehlschlagen"
-  if (formspreeSuccess || webhookSuccess) {
-    console.log('[Vercel API Lead] Lead processing completed successfully. Success states:', { formspreeSuccess, webhookSuccess });
+  // Return success if at least one submission succeeded
+  if (webhookSuccess || arillaSuccess || formspreeSuccess) {
     return res.status(200).json({
       success: true,
-      formspreeSuccess,
-      webhookSuccess
+      webhookSuccess,
+      arillaSuccess,
+      formspreeSuccess
     });
   } else {
-    console.error('[Vercel API Lead] Both formspree and webhook dispatch actions failed entirely.');
     return res.status(500).json({
-      error: 'Submission failed',
-      formspreeError,
-      webhookError
+      error: 'Übermittlung im Hintergrund fehlgeschlagen.',
+      webhookError: webhookErrorText,
+      arillaError: arillaErrorText,
+      formspreeError: formspreeErrorText
     });
   }
 }
