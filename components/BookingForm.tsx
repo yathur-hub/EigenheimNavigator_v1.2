@@ -811,30 +811,10 @@ const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onClose, title, su
  
           <div className="pt-2">
             {isALead && (
-              <div className="space-y-6">
-                <p className="text-slate-650 font-medium text-sm sm:text-base leading-relaxed">
-                  Vielen Dank. Deine Angaben zeigen, dass eine persönliche Einschätzung sinnvoll ist.
-                  <br className="hidden sm:inline" /> Wir prüfen deine Situation und melden uns zeitnah bei dir.
-                </p>
-                <div className="bg-blue-50/65 border border-blue-100 p-5 rounded-2xl text-left flex gap-4 items-start max-w-lg mx-auto">
-                  <Sparkles className="text-blue-600 flex-shrink-0 w-5 h-5 mt-0.5" />
-                  <div className="space-y-1">
-                    <h4 className="font-extrabold text-blue-900 text-xs sm:text-sm">Buche direkt dein kostenloses Erstgespräch:</h4>
-                    <p className="text-blue-700 text-xs text-slate-600">Sichere dir deinen Wunschtermin direkt online, um rascher vorwärtszukommen.</p>
-                  </div>
-                </div>
-                <div className="flex justify-center pt-2">
-                  <a 
-                    href={SCHEDULER_LINK}
-                    target="_blank" 
-                    rel="noopener noreferrer" 
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-xl font-black text-sm shadow-xl shadow-blue-250 transition-all hover:scale-[1.02] flex items-center gap-2.5"
-                  >
-                    <PhoneCall size={16} />
-                    <span>Termin direkt auswählen</span>
-                  </a>
-                </div>
-              </div>
+              <p className="text-slate-650 font-medium text-sm sm:text-base leading-relaxed">
+                Vielen Dank. Deine Angaben zeigen, dass eine persönliche Einschätzung sinnvoll ist.
+                <br className="hidden sm:inline" /> Wir prüfen deine Situation und melden uns zeitnah bei dir.
+              </p>
             )}
  
             {isBLead && (
