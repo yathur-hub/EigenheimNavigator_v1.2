@@ -131,6 +131,7 @@ export default async function handler(
 
   // 1. Send complete detailed JSON payload to primary CRM / Automation Webhook
   try {
+    console.log("Sending Eigenheimnavi lead to webhook:", webhookUrl);
     const webhookResponse = await fetch(webhookUrl, {
       method: 'POST',
       headers: {
