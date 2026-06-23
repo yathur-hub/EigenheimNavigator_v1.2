@@ -89,7 +89,7 @@ const initialFormState: FormState = {
     email: '',
     phone: '',
     consultation_interest: '',
-    contact_preference: '',
+    contact_preference: 'phone',
     preferred_contact_time: '',
     message: '',
     privacy_consent: false,
@@ -344,9 +344,6 @@ const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onClose, title, su
 
     if (!data.step_4_contact.consultation_interest) {
       errorMap.consultation_interest = 'Bitte wähle eine Option aus.';
-    }
-    if (!data.step_4_contact.contact_preference) {
-      errorMap.contact_preference = 'Bitte wähle eine Option aus.';
     }
     if (!data.step_4_contact.privacy_consent) {
       errorMap.privacy_consent = 'Bitte bestätige die Datenschutzerklärung.';
@@ -1558,7 +1555,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onClose, title, su
                     validationTriggered && errors.phone ? 'border-rose-350 bg-rose-50/5' : 'border-slate-200 hover:border-slate-300'
                   }`}
                 />
-                <p className="text-[10px] text-slate-400 font-semibold leading-normal mt-1">Wir verwenden deine Telefonnummer nur zur Bearbeitung deiner Anfrage.</p>
+                <p className="text-[10px] text-slate-400 font-semibold leading-normal mt-1">Wir melden uns telefonisch bei dir. Deine Telefonnummer verwenden wir nur zur Bearbeitung deiner Anfrage.</p>
                 {validationTriggered && errors.phone && (
                   <p className="text-rose-600 text-xs font-bold leading-tight mt-1 flex items-center gap-1 animate-fade-in" role="alert">{errors.phone}</p>
                 )}
@@ -1607,45 +1604,6 @@ const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onClose, title, su
                 <div className="text-rose-600 text-xs font-bold leading-none mt-1.5 flex items-center gap-1.5 animate-fade-in" role="alert">
                   <AlertCircle size={13} className="flex-shrink-0" />
                   <span>{errors.consultation_interest}</span>
-                </div>
-              )}
-            </div>
-
-            {/* CONTACT PREFERENCE */}
-            <div className="space-y-3" data-field-key="contact_preference">
-              <label id="contact_preference_label" className="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1 uppercase tracking-wider">
-                <span>Wie dürfen wir dich am besten kontaktieren?</span>
-                <span className="text-rose-500" aria-hidden="true">*</span>
-              </label>
-              
-              <div className="grid grid-cols-3 gap-2.5" role="radiogroup" aria-labelledby="contact_preference_label">
-                {CONTACT_PREFERENCE_OPTIONS.map((opt) => {
-                  const isSelected = formData.step_4_contact.contact_preference === opt.value;
-                  const isError = validationTriggered && errors.contact_preference;
-                  return (
-                    <button
-                      type="button"
-                      key={opt.value}
-                      onClick={() => handleSingleSelectChange('step_4_contact', 'contact_preference', opt.value)}
-                      aria-checked={isSelected}
-                      role="radio"
-                      className={`p-3 rounded-xl text-center transition-all border outline-none active:scale-[0.99] cursor-pointer text-xs sm:text-sm font-bold focus:ring-2 focus:ring-blue-600 focus:ring-offset-1 ${
-                        isSelected
-                          ? 'border-blue-600 bg-blue-600 text-white scale-105 shadow-sm'
-                          : isError
-                            ? 'border-rose-300 bg-rose-50/10 text-slate-700 hover:border-rose-450'
-                            : 'border-slate-200 bg-white text-slate-700 hover:border-slate-350 hover:bg-slate-50'
-                      }`}
-                    >
-                      <span>{opt.label}</span>
-                    </button>
-                  );
-                })}
-              </div>
-              {validationTriggered && errors.contact_preference && (
-                <div className="text-rose-600 text-xs font-bold leading-none mt-1.5 flex items-center gap-1.5 animate-fade-in" role="alert">
-                  <AlertCircle size={13} className="flex-shrink-0" />
-                  <span>{errors.contact_preference}</span>
                 </div>
               )}
             </div>
