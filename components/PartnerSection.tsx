@@ -6,13 +6,13 @@ interface PartnerSectionProps {
 }
 
 const clientImages = [
-  "https://eigenheimnavigator.ch/images/client4.png",
-  "https://eigenheimnavigator.ch/images/client5.png",
-  "https://eigenheimnavigator.ch/images/client6.png",
-  "https://eigenheimnavigator.ch/images/client7.png",
-  "https://eigenheimnavigator.ch/images/client1.png",
-  "https://eigenheimnavigator.ch/images/client2.png",
-  "https://eigenheimnavigator.ch/images/client3.png"
+  "https://raw.githubusercontent.com/yathur-hub/EigenheimNavi-BrandAssets/main/Buob-Familie.jpg",
+  "https://raw.githubusercontent.com/yathur-hub/EigenheimNavi-BrandAssets/main/Frischknech%201.jpg",
+  "https://raw.githubusercontent.com/yathur-hub/EigenheimNavi-BrandAssets/main/Gro%CC%88nemeyer%201.jpg",
+  "https://raw.githubusercontent.com/yathur-hub/EigenheimNavi-BrandAssets/main/Gru%CC%88ndig%20&%20Stillhart.JPG",
+  "https://raw.githubusercontent.com/yathur-hub/EigenheimNavi-BrandAssets/main/Niru%26Adsaya-3.jpg",
+  "https://raw.githubusercontent.com/yathur-hub/EigenheimNavi-BrandAssets/main/Peter%20Anna%20%26%20Ru%CC%88egg%20Luca%201.jpeg",
+  "https://raw.githubusercontent.com/yathur-hub/EigenheimNavi-BrandAssets/main/Ponik%20Familie.jpg"
 ];
 
 const PartnerSection: React.FC<PartnerSectionProps> = ({ onStartCheck }) => {

@@ -69,10 +69,10 @@ const Hero: React.FC<HeroProps> = ({ onStartCheck }) => {
               <div className="flex items-center gap-4">
                  <div className="flex -space-x-3">
                    {[
-                     "https://eigenheimnavigator.ch/images/client4.png",
-                     "https://eigenheimnavigator.ch/images/client5.png",
-                     "https://eigenheimnavigator.ch/images/client6.png",
-                     "https://eigenheimnavigator.ch/images/client7.png"
+                     "https://raw.githubusercontent.com/yathur-hub/EigenheimNavi-BrandAssets/main/Buob-Familie.jpg",
+                     "https://raw.githubusercontent.com/yathur-hub/EigenheimNavi-BrandAssets/main/Malnder%20Michael.jpg",
+                     "https://raw.githubusercontent.com/yathur-hub/EigenheimNavi-BrandAssets/main/Tushi%20(1).jpeg",
+                     "https://raw.githubusercontent.com/yathur-hub/EigenheimNavi-BrandAssets/main/X_Lechmann%20Marco%20%26%20Melnaie1.jpg"
                    ].map((src, i) => (
                      <div key={i} className="w-10 h-10 rounded-full border-2 border-white bg-slate-100 overflow-hidden">
                        <img src={src} alt="user" className="w-full h-full object-cover" />
