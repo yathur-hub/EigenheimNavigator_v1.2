@@ -1,7 +1,6 @@
 
 import React from 'react';
 import Hero from '../../components/Hero';
-import LogoSlider from '../../components/LogoSlider';
 import ProblemSection from '../../components/ProblemSection';
 import TargetGroupSection from '../../components/TargetGroupSection';
 import SolutionSection from '../../components/SolutionSection';
@@ -60,10 +59,6 @@ const Home: React.FC<HomeProps> = ({ onStartCheck }) => {
       
       <Reveal className="w-full" delay={50}>
         <TeamSection onStartCheck={onStartCheck} />
-      </Reveal>
-      
-      <Reveal className="w-full" delay={50}>
-        <LogoSlider />
       </Reveal>
       
       <Reveal className="w-full" delay={50}>
