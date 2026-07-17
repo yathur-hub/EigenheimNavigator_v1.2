@@ -94,7 +94,7 @@ const App: React.FC = () => {
             </div>
 
             {/* Scrollable Content */}
-            <div className="flex-grow overflow-y-auto no-scrollbar px-4 py-6 sm:px-10 sm:py-8 flex flex-col justify-center min-h-[350px]">
+            <div className="flex-grow overflow-y-auto no-scrollbar px-4 py-6 sm:px-10 sm:py-8 flex flex-col justify-start min-h-[350px]">
               {showCloseConfirm ? (
                 <div className="w-full max-w-md mx-auto text-center py-6 px-4 flex flex-col items-center justify-center">
                   <div className="mb-5 relative">

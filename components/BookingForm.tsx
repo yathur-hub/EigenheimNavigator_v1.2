@@ -1657,7 +1657,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onClose, title, su
     handleSingleSelectChange(group, key, value);
 
     const activeQ = MOBILE_QUESTIONS[mobileQuestionIndex];
-    if (activeQ.category !== 'Kontaktdaten') {
+    if (activeQ.category !== 'Kontaktdaten' || activeQ.type === 'single_select') {
       setTimeout(() => {
         if (mobileQuestionIndex < MOBILE_QUESTIONS.length - 1) {
           transitionToNextMobileQuestion(mobileQuestionIndex + 1);
@@ -1675,7 +1675,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onClose, title, su
     handleSingleSelectChange(group, key, value);
 
     const activeQ = MOBILE_QUESTIONS[mobileQuestionIndex];
-    if (value && activeQ.category !== 'Kontaktdaten') {
+    if (value && (activeQ.category !== 'Kontaktdaten' || activeQ.type === 'dropdown')) {
       setTimeout(() => {
         if (mobileQuestionIndex < MOBILE_QUESTIONS.length - 1) {
           transitionToNextMobileQuestion(mobileQuestionIndex + 1);
