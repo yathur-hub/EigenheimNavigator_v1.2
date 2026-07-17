@@ -13,6 +13,9 @@ import { Link } from 'react-router-dom';
 
 const App: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [showCloseConfirm, setShowCloseConfirm] = useState(false);
+  const [percent, setPercent] = useState(0);
+  const [remainingCount, setRemainingCount] = useState(17);
   
   const track = (event: string, data?: any) => {
     console.log(`Tracking: ${event}`, data || '');
@@ -21,13 +24,36 @@ const App: React.FC = () => {
   const openModal = () => {
     track('modal_open');
     setIsModalOpen(true);
+    setShowCloseConfirm(false);
     document.body.style.overflow = 'hidden';
+  };
+
+  const confirmClose = () => {
+    track('modal_confirm_close');
+    try {
+      localStorage.removeItem('eigenheim_navigator_form_data');
+      localStorage.removeItem('eigenheim_navigator_step');
+      localStorage.removeItem('eigenheim_navigator_mobile_index');
+    } catch (e) {
+      console.error(e);
+    }
+    setShowCloseConfirm(false);
+    setIsModalOpen(false);
+    document.body.style.overflow = 'unset';
   };
 
   const closeModal = () => {
     track('check_modal_close');
-    setIsModalOpen(false);
-    document.body.style.overflow = 'unset';
+    if (showCloseConfirm) {
+      confirmClose();
+      return;
+    }
+    if (percent > 0) {
+      setShowCloseConfirm(true);
+    } else {
+      setIsModalOpen(false);
+      document.body.style.overflow = 'unset';
+    }
   };
 
   return (
@@ -68,8 +94,51 @@ const App: React.FC = () => {
             </div>
 
             {/* Scrollable Content */}
-            <div className="flex-grow overflow-y-auto no-scrollbar px-4 py-6 sm:px-10 sm:py-8">
-               <BookingForm variant="modal" onSuccess={() => track('check_success')} onClose={closeModal} />
+            <div className="flex-grow overflow-y-auto no-scrollbar px-4 py-6 sm:px-10 sm:py-8 flex flex-col justify-center min-h-[350px]">
+              {showCloseConfirm ? (
+                <div className="w-full max-w-md mx-auto text-center py-6 px-4 flex flex-col items-center justify-center">
+                  <div className="mb-5 relative">
+                    <div className="w-16 h-16 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 shadow-sm">
+                      <svg className="w-8 h-8" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                      </svg>
+                    </div>
+                  </div>
+                  
+                  <h3 className="text-xl font-black text-slate-900 leading-snug mb-3">
+                    Fast geschafft!
+                  </h3>
+                  
+                  <p className="text-slate-600 font-medium text-sm sm:text-base mb-8 max-w-xs leading-relaxed">
+                    Du bist schon bei <span className="font-extrabold text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded">{percent}%</span> — nur noch <span className="font-extrabold text-slate-900">{remainingCount}</span> kurze {remainingCount === 1 ? 'Frage' : 'Fragen'} bis zu deiner Einschätzung.
+                  </p>
+
+                  <div className="flex flex-col sm:flex-row gap-3 w-full">
+                    <button 
+                      onClick={() => setShowCloseConfirm(false)}
+                      className="flex-1 bg-blue-600 hover:bg-blue-700 active:scale-[0.98] text-white px-6 py-4 rounded-xl font-bold text-sm shadow-md transition-all cursor-pointer hover:shadow-lg text-center"
+                    >
+                      Weiter ausfüllen
+                    </button>
+                    <button 
+                      onClick={confirmClose}
+                      className="flex-1 bg-slate-100 hover:bg-slate-200 active:scale-[0.98] text-slate-700 px-6 py-4 rounded-xl font-bold text-sm transition-all cursor-pointer text-center"
+                    >
+                      Trotzdem abbrechen
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <BookingForm 
+                  variant="modal" 
+                  onSuccess={() => track('check_success')} 
+                  onClose={closeModal} 
+                  onProgressUpdate={(p, r) => {
+                    setPercent(p);
+                    setRemainingCount(r);
+                  }}
+                />
+              )}
             </div>
 
             {/* Modal Footer */}

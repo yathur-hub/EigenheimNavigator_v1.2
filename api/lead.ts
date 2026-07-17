@@ -29,7 +29,7 @@ export default async function handler(
 
   // Validate presence of standard request containers
   if (!contact || !property_goal || !financial_situation || !regional_profile || !consultation || !consents) {
-    console.error('[Vercel API Lead] Validation failed: Missing payload containers');
+    console.warn('[Vercel API Lead] Validation failed: Missing payload containers');
     return res.status(400).json({
       error: 'Ungültige Payload-Struktur. Datencontainer fehlen.'
     });
@@ -43,7 +43,7 @@ export default async function handler(
     !contact.phone ||
     !consents.privacy_consent
   ) {
-    console.error('[Vercel API Lead] Validation failed: Invalid contact fields or missing privacy consent', { contact, consents });
+    console.warn('[Vercel API Lead] Validation failed: Invalid contact fields or missing privacy consent', { contact, consents });
     return res.status(400).json({
       error: 'Vorname, Nachname, E-Mail-Adresse und Telefonnummer sind erforderlich. Die Datenschutzerklärung muss bestätigt werden.'
     });
@@ -145,10 +145,10 @@ export default async function handler(
     webhookSuccess = webhookResponse.ok;
     if (!webhookSuccess) {
       webhookErrorText = await webhookResponse.text();
-      console.error('[Vercel API Lead] Primary Webhook error status:', webhookResponse.status, webhookErrorText);
+      console.warn('[Vercel API Lead] Primary Webhook not successful (status ' + webhookResponse.status + '):', webhookErrorText);
     }
   } catch (error: any) {
-    console.error('[Vercel API Lead] Error sending to primary Webhook:', error);
+    console.warn('[Vercel API Lead] Warning: primary Webhook dispatch failed:', error);
     webhookErrorText = error?.message || String(error);
   }
 
@@ -167,7 +167,7 @@ export default async function handler(
       formspreeErrorText = await formspreeResponse.text();
     }
   } catch (error: any) {
-    console.error('[Vercel API Lead] Error sending to Formspree:', error);
+    console.warn('[Vercel API Lead] Warning: Formspree dispatch failed:', error);
     formspreeErrorText = error?.message || String(error);
   }
 
