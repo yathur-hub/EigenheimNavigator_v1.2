@@ -14,11 +14,8 @@ const Hero: React.FC<HeroProps> = ({ onStartCheck }) => {
           {/* Left Column: Copy */}
           <div className="space-y-8 animate-fade-in order-2 lg:order-1">
             <div className="space-y-4">
-              <div className="inline-flex items-center gap-2 px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-[10px] md:text-xs font-black uppercase tracking-widest border border-blue-100">
-                <span>Kostenloser Eigenheim-Realitätscheck</span>
-              </div>
               <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-[54px] font-extrabold text-slate-900 leading-[1.05] tracking-tight">
-                Finde heraus, ob dein Eigenheim in der Ostschweiz realistisch ist.
+                Finde heraus, ob dein Eigenheim realistisch ist.
               </h1>
               <p className="text-sm sm:text-base md:text-lg text-slate-600 font-medium leading-relaxed max-w-xl">
                 Im kostenlosen Eigenheim-Realitätscheck erhältst du eine ehrliche Einschätzung zu deiner Ausgangslage, deiner Finanzierungsfähigkeit und den nächsten sinnvollen Schritten.
@@ -34,12 +31,14 @@ const Hero: React.FC<HeroProps> = ({ onStartCheck }) => {
                 >
                   Kostenlosen Realitätscheck starten
                 </button>
-                <a 
-                  href="#ablauf"
-                  className="w-full sm:w-auto text-center border-2 border-slate-100 hover:border-blue-200 bg-white text-slate-700 hover:text-blue-600 px-6 sm:px-8 py-4 sm:py-4.5 rounded-2xl font-black text-sm sm:text-base transition-all hover:scale-[1.02] active:scale-[0.98]"
-                >
-                  Ablauf ansehen
-                </a>
+              </div>
+
+              {/* EXPECTATION HINT DIRECTLY UNDER THE BUTTONS */}
+              <div className="flex items-center gap-2 pl-1 text-slate-600 text-xs sm:text-sm font-extrabold">
+                <svg className="w-4 h-4 text-blue-600 flex-shrink-0 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span>In 3 Minuten zu deinem Realitätscheck</span>
               </div>
 
               {/* Trust-Hinweise directly below the CTAs */}
@@ -54,7 +53,7 @@ const Hero: React.FC<HeroProps> = ({ onStartCheck }) => {
                   <svg className="w-4 h-4 text-emerald-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="3">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                   </svg>
-                  <span>Für Eigenheim-Interessierte in der Ostschweiz</span>
+                  <span>Für Personen mit Wunsch nach Eigenheim</span>
                 </div>
                 <div className="flex items-center gap-1.5">
                   <svg className="w-4 h-4 text-emerald-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="3">

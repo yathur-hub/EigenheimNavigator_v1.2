@@ -227,6 +227,32 @@ const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onClose, title, su
   const [isSuccess, setIsSuccess] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   
+  // Transition simulation loading
+  const [isCalculatingTransition, setIsCalculatingTransition] = useState(false);
+  const [transitionLoadingText, setTransitionLoadingText] = useState('Daten werden analysiert...');
+
+  // Track focused state for mobile keyboard avoidance
+  const [isInputFocused, setIsInputFocused] = useState(false);
+
+  // Focus tracking for input elements
+  useEffect(() => {
+    const handleFocusIn = (e: FocusEvent) => {
+      const target = e.target as HTMLElement;
+      if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'SELECT')) {
+        setIsInputFocused(true);
+      }
+    };
+    const handleFocusOut = () => {
+      setIsInputFocused(false);
+    };
+    document.addEventListener('focusin', handleFocusIn);
+    document.addEventListener('focusout', handleFocusOut);
+    return () => {
+      document.removeEventListener('focusin', handleFocusIn);
+      document.removeEventListener('focusout', handleFocusOut);
+    };
+  }, []);
+
   // Validation state
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [validationTriggered, setValidationTriggered] = useState(false);
@@ -359,8 +385,9 @@ const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onClose, title, su
 
     const element = document.querySelector(`[data-field-key="${firstErrorKey}"]`) as HTMLElement;
     if (element) {
+      const prefersReduced = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       element.scrollIntoView({
-        behavior: 'smooth',
+        behavior: prefersReduced ? 'auto' : 'smooth',
         block: 'center'
       });
 
@@ -593,7 +620,11 @@ const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onClose, title, su
   // Scroll helper back to form header
   const scrollToTop = () => {
     if (headerRef.current) {
-      headerRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      const prefersReduced = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      headerRef.current.scrollIntoView({ 
+        behavior: prefersReduced ? 'auto' : 'smooth', 
+        block: 'start' 
+      });
     }
   };
 
@@ -609,13 +640,24 @@ const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onClose, title, su
 
     if (Object.keys(stepErrors).length === 0) {
       track(`form_step${step}_complete`, { formDataStep: formData });
-      setStep((prev) => {
-        const next = (prev + 1) as 1 | 2 | 3 | 4;
-        return next;
-      });
-      setValidationTriggered(false);
-      // Wait for React to transition steps before scrolling
-      setTimeout(scrollToTop, 50);
+      
+      let loadingText = 'Daten werden analysiert...';
+      if (step === 1) loadingText = 'Wohnwunsch-Faktoren werden ausgewertet...';
+      else if (step === 2) loadingText = 'Finanzielle Tragbarkeit wird berechnet...';
+      else if (step === 3) loadingText = 'Regionale Optionen werden geprüft...';
+
+      setTransitionLoadingText(loadingText);
+      setIsCalculatingTransition(true);
+
+      setTimeout(() => {
+        setStep((prev) => {
+          const next = (prev + 1) as 1 | 2 | 3 | 4;
+          return next;
+        });
+        setIsCalculatingTransition(false);
+        setValidationTriggered(false);
+        setTimeout(scrollToTop, 50);
+      }, 700);
     } else {
       console.warn("Validation failed for step", step, stepErrors);
       setTimeout(() => {
@@ -848,13 +890,21 @@ const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onClose, title, su
     );
   }
 
+  const isStep1GoalFilled = !!formData.step_1_property_goal.property_goal;
+  const isStep1TypeFilled = formData.step_1_property_goal.property_type.length > 0;
+  const isStep1TimelineFilled = !!formData.step_1_property_goal.buying_timeline;
+
+  const showPropertyType = isStep1GoalFilled || validationTriggered;
+  const showBuyingTimeline = (isStep1GoalFilled && isStep1TypeFilled) || validationTriggered;
+  const showActionDock = (isStep1GoalFilled && isStep1TypeFilled && isStep1TimelineFilled) || validationTriggered;
+
   return (
     <div className="flex flex-col w-full text-slate-900" ref={headerRef}>
       
       {/* 1. PROGRESS STATUS BLOCK */}
-      <div className="mb-6 sm:mb-8" id="step_header">
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-[10px] sm:text-xs font-black bg-blue-50 text-blue-700 px-3 py-1 rounded-full uppercase tracking-wider">
+      <div className="mb-8" id="step_header">
+        <div className="flex items-center justify-between mb-3">
+          <span className="text-[10px] sm:text-xs font-black bg-blue-50 text-blue-700 px-3 py-1 rounded-full uppercase tracking-widest">
             Schritt {step} von 4
           </span>
           <span className="text-[10px] sm:text-xs font-black text-blue-600/90 tracking-wide bg-blue-50/50 px-2.5 py-1 rounded-full">
@@ -862,14 +912,37 @@ const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onClose, title, su
           </span>
         </div>
         
-        {/* Progress bar with smooth motion */}
-        <div className="relative h-2 w-full bg-slate-100/80 rounded-full overflow-hidden border border-slate-200/40">
-          <motion.div 
-            className="h-full bg-gradient-to-r from-blue-500 to-blue-600 rounded-full shadow-inner"
-            initial={{ width: `${(step - 1) * 25}%` }}
-            animate={{ width: `${step * 25}%` }}
-            transition={{ duration: 0.4, ease: "easeOut" }}
-          />
+        {/* Transparent Segmented Stepper */}
+        <div className="grid grid-cols-4 gap-2 mt-3">
+          {[
+            { label: 'Eigenheimwunsch', num: 1 },
+            { label: 'Finanzen', num: 2 },
+            { label: 'Region & Situation', num: 3 },
+            { label: 'Kontaktdaten', num: 4 }
+          ].map((s) => {
+            const isActive = step === s.num;
+            const isCompleted = step > s.num;
+            return (
+              <div key={s.num} className="text-center flex flex-col items-stretch">
+                <div className={`h-1.5 rounded-full transition-all duration-300 ${
+                  isActive 
+                    ? 'bg-blue-600 shadow-sm shadow-blue-300' 
+                    : isCompleted 
+                      ? 'bg-blue-500/80' 
+                      : 'bg-slate-200/60'
+                }`} />
+                <span className={`text-[9px] sm:text-[10px] font-black mt-2 tracking-tight transition-colors duration-200 block text-center ${
+                  isActive 
+                    ? 'text-blue-750' 
+                    : isCompleted 
+                      ? 'text-slate-500' 
+                      : 'text-slate-400'
+                }`}>
+                  {s.label}
+                </span>
+              </div>
+            );
+          })}
         </div>
       </div>
 
@@ -889,12 +962,77 @@ const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onClose, title, su
       </div>
 
       {/* Form Area wrapper */}
-      <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-8" noValidate>
+      <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-8 relative" noValidate>
+        
+        {isCalculatingTransition && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute inset-x-0 -top-4 bottom-0 bg-white/95 backdrop-blur-sm z-50 flex flex-col items-center justify-center p-6 text-center"
+          >
+            <div className="relative mb-5 flex items-center justify-center">
+              <span className="absolute inline-flex h-16 w-16 rounded-full bg-blue-100 animate-ping opacity-75"></span>
+              <div className="relative w-12 h-12 rounded-full border-4 border-blue-100 border-t-blue-600 animate-spin flex items-center justify-center bg-white shadow-md">
+                <div className="w-3.5 h-3.5 rounded-full bg-[#F87101] animate-pulse" />
+              </div>
+            </div>
+            <h3 className="text-sm font-black text-slate-800 uppercase tracking-widest animate-pulse">Schritt-Auswertung</h3>
+            <p className="text-xs font-bold text-slate-500 mt-2 max-w-xs">{transitionLoadingText}</p>
+          </motion.div>
+        )}
         
         {/* STEP 1: EIGENHEIMWUNSCH CARD SELECTIONS */}
         {step === 1 && (
-          <div className="space-y-6 sm:space-y-8 animate-fade-in">
-            
+          <motion.div
+            key="step-1"
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -12 }}
+            transition={{ duration: 0.22, ease: "easeInOut" }}
+            className="space-y-6 sm:space-y-8"
+          >
+            {/* COGNITIVE REASSURANCE / EXPECTATION CONTROL BANNER */}
+            <div className="bg-gradient-to-br from-blue-50/80 to-slate-50/50 border border-blue-100/80 rounded-2xl p-5 mb-2 shadow-sm relative overflow-hidden">
+              <div className="absolute right-0 top-0 translate-x-4 -translate-y-4 w-24 h-24 bg-blue-100/30 rounded-full blur-xl pointer-events-none" />
+              <div className="flex items-center gap-2 mb-3">
+                <div className="w-2 h-2 rounded-full bg-blue-600 animate-pulse" />
+                <span className="text-[10px] font-black tracking-widest text-blue-850 uppercase">Deine 3-Minuten-Ergebnisgarantie</span>
+              </div>
+              <h4 className="text-sm font-bold text-slate-800 mb-2">Was dich beim Realitätscheck erwartet:</h4>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 pt-1.5">
+                <div className="flex items-start gap-2.5">
+                  <div className="w-7 h-7 rounded-xl bg-blue-100/60 text-blue-600 flex items-center justify-center flex-shrink-0">
+                    <Clock size={14} strokeWidth={2.5} />
+                  </div>
+                  <div>
+                    <p className="text-[11px] font-extrabold text-slate-800 leading-none">⏱️ 3 Minuten</p>
+                    <p className="text-[10px] text-slate-500 font-medium mt-1">Nur 4 kurze, unkomplizierte Schritte.</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-start gap-2.5">
+                  <div className="w-7 h-7 rounded-xl bg-blue-100/60 text-blue-600 flex items-center justify-center flex-shrink-0">
+                    <Lock size={14} strokeWidth={2.5} />
+                  </div>
+                  <div>
+                    <p className="text-[11px] font-extrabold text-slate-800 leading-none">🔒 Ohne E-Mail-Pflicht</p>
+                    <p className="text-[10px] text-slate-500 font-medium mt-1">Keine E-Mail-Pflicht bis zum allerletzten Schritt.</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-2.5">
+                  <div className="w-7 h-7 rounded-xl bg-emerald-100/60 text-emerald-600 flex items-center justify-center flex-shrink-0">
+                    <ShieldCheck size={14} strokeWidth={2.5} />
+                  </div>
+                  <div>
+                    <p className="text-[11px] font-extrabold text-slate-800 leading-none">💡 Unverbindlich</p>
+                    <p className="text-[10px] text-slate-500 font-medium mt-1">100% kostenloser Check ohne Verkaufsdruck.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             {/* PROPERTY GOAL */}
             <div className="space-y-3" data-field-key="property_goal">
               <label id="property_goal_label" className="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1 uppercase tracking-wider">
@@ -942,114 +1080,148 @@ const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onClose, title, su
             </div>
 
             {/* PROPERTY TYPE */}
-            <div className="space-y-3" data-field-key="property_type">
-              <label id="property_type_label" className="text-xs sm:text-sm font-black text-slate-800 flex flex-wrap items-center gap-1.5 uppercase tracking-wider">
-                <span>Welche Art von Eigenheim interessiert dich?</span>
-                <span className="text-rose-500" aria-hidden="true">*</span>
-                <span className="text-[10px] font-extrabold text-slate-400 bg-slate-100 px-2 py-0.5 rounded-md ml-auto normal-case tracking-normal">Mehrfachauswahl möglich</span>
-              </label>
-              
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5" role="group" aria-labelledby="property_type_label">
-                {PROPERTY_TYPE_OPTIONS.map((opt) => {
-                  const isSelected = formData.step_1_property_goal.property_type.includes(opt.value);
-                  const isError = validationTriggered && errors.property_type;
-                  return (
-                    <button
-                      type="button"
-                      key={opt.value}
-                      onClick={() => handleMultiSelectToggle('step_1_property_goal', 'property_type', opt.value)}
-                      aria-pressed={isSelected}
-                      className={`p-4 rounded-xl text-left transition-all border outline-none flex items-center justify-between active:scale-[0.99] cursor-pointer min-h-[50px] group focus:ring-2 focus:ring-blue-600 focus:ring-offset-1 ${
-                        isSelected
-                          ? 'border-blue-600 bg-blue-50/10 text-blue-900 font-bold shadow-sm shadow-blue-50/15'
-                          : isError
-                            ? 'border-rose-300 bg-rose-50/10 text-slate-700 hover:border-rose-400'
-                            : 'border-slate-200/90 bg-white text-slate-700 hover:border-slate-350 hover:bg-slate-50/30 font-medium'
-                      }`}
-                    >
-                      <span className="text-xs sm:text-sm leading-relaxed pr-2 group-hover:text-slate-900 transition-colors">{opt.label}</span>
-                      <span className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all flex-shrink-0 ${
-                        isSelected
-                          ? 'border-blue-600 bg-blue-600 text-white scale-105'
-                          : 'border-slate-300 bg-white group-hover:border-slate-450'
-                      }`}>
-                        {isSelected && <Check size={11} strokeWidth={4.5} />}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-              {validationTriggered && errors.property_type && (
-                <div className="text-rose-600 text-xs font-bold leading-tight mt-1.5 flex items-center gap-1.5 animate-fade-in" role="alert">
-                  <AlertCircle size={13} className="flex-shrink-0" />
-                  <span>{errors.property_type}</span>
+            {showPropertyType && (
+              <motion.div 
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3 }}
+                className="space-y-3" 
+                data-field-key="property_type"
+              >
+                <label id="property_type_label" className="text-xs sm:text-sm font-black text-slate-800 flex flex-wrap items-center gap-1.5 uppercase tracking-wider">
+                  <span>Welche Art von Eigenheim interessiert dich?</span>
+                  <span className="text-rose-500" aria-hidden="true">*</span>
+                  <span className="text-[10px] font-extrabold text-slate-400 bg-slate-100 px-2 py-0.5 rounded-md ml-auto normal-case tracking-normal">Mehrfachauswahl möglich</span>
+                </label>
+                
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5" role="group" aria-labelledby="property_type_label">
+                  {PROPERTY_TYPE_OPTIONS.map((opt) => {
+                    const isSelected = formData.step_1_property_goal.property_type.includes(opt.value);
+                    const isError = validationTriggered && errors.property_type;
+                    return (
+                      <button
+                        type="button"
+                        key={opt.value}
+                        onClick={() => handleMultiSelectToggle('step_1_property_goal', 'property_type', opt.value)}
+                        aria-pressed={isSelected}
+                        className={`p-4 rounded-xl text-left transition-all border outline-none flex items-center justify-between active:scale-[0.99] cursor-pointer min-h-[50px] group focus:ring-2 focus:ring-blue-600 focus:ring-offset-1 ${
+                          isSelected
+                            ? 'border-blue-600 bg-blue-50/10 text-blue-900 font-bold shadow-sm shadow-blue-50/15'
+                            : isError
+                              ? 'border-rose-300 bg-rose-50/10 text-slate-700 hover:border-rose-400'
+                              : 'border-slate-200/90 bg-white text-slate-700 hover:border-slate-350 hover:bg-slate-50/30 font-medium'
+                        }`}
+                      >
+                        <span className="text-xs sm:text-sm leading-relaxed pr-2 group-hover:text-slate-900 transition-colors">{opt.label}</span>
+                        <span className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all flex-shrink-0 ${
+                          isSelected
+                            ? 'border-blue-600 bg-blue-600 text-white scale-105'
+                            : 'border-slate-300 bg-white group-hover:border-slate-450'
+                        }`}>
+                          {isSelected && <Check size={11} strokeWidth={4.5} />}
+                        </span>
+                      </button>
+                    );
+                  })}
                 </div>
-              )}
-            </div>
+                {validationTriggered && errors.property_type && (
+                  <div className="text-rose-600 text-xs font-bold leading-tight mt-1.5 flex items-center gap-1.5 animate-fade-in" role="alert">
+                    <AlertCircle size={13} className="flex-shrink-0" />
+                    <span>{errors.property_type}</span>
+                  </div>
+                )}
+              </motion.div>
+            )}
 
             {/* BUYING TIMELINE */}
-            <div className="space-y-3" data-field-key="buying_timeline">
-              <label id="buying_timeline_label" className="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1 uppercase tracking-wider">
-                <span>Wann möchtest du dein Eigenheim realisieren?</span>
-                <span className="text-rose-500" aria-hidden="true">*</span>
-              </label>
-              
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5" role="radiogroup" aria-labelledby="buying_timeline_label">
-                {BUYING_TIMELINE_OPTIONS.map((opt) => {
-                  const isSelected = formData.step_1_property_goal.buying_timeline === opt.value;
-                  const isError = validationTriggered && errors.buying_timeline;
-                  return (
-                    <button
-                      type="button"
-                      key={opt.value}
-                      onClick={() => handleSingleSelectChange('step_1_property_goal', 'buying_timeline', opt.value)}
-                      aria-checked={isSelected}
-                      role="radio"
-                      className={`p-4 rounded-xl text-left transition-all border outline-none flex items-center justify-between active:scale-[0.99] cursor-pointer min-h-[50px] group focus:ring-2 focus:ring-blue-600 focus:ring-offset-1 ${
-                        isSelected
-                          ? 'border-blue-600 bg-blue-50/10 text-blue-900 font-bold shadow-sm shadow-blue-50/15'
-                          : isError
-                            ? 'border-rose-300 bg-rose-50/10 text-slate-700 hover:border-rose-400'
-                            : 'border-slate-200/90 bg-white text-slate-700 hover:border-slate-350 hover:bg-slate-50/30 font-medium'
-                      }`}
-                    >
-                      <span className="text-xs sm:text-sm leading-relaxed pr-2 group-hover:text-slate-900 transition-colors">{opt.label}</span>
-                      <span className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all flex-shrink-0 ${
-                        isSelected
-                          ? 'border-blue-600 bg-blue-600 text-white scale-110'
-                          : 'border-slate-300 bg-white group-hover:border-slate-450'
-                      }`}>
-                        {isSelected && <Check size={11} strokeWidth={4.5} />}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-              {validationTriggered && errors.buying_timeline && (
-                <div className="text-rose-600 text-xs font-bold leading-tight mt-1.5 flex items-center gap-1.5 animate-fade-in" role="alert">
-                  <AlertCircle size={13} className="flex-shrink-0" />
-                  <span>{errors.buying_timeline}</span>
+            {showBuyingTimeline && (
+              <motion.div 
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3 }}
+                className="space-y-3" 
+                data-field-key="buying_timeline"
+              >
+                <label id="buying_timeline_label" className="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1 uppercase tracking-wider">
+                  <span>Wann möchtest du dein Eigenheim realisieren?</span>
+                  <span className="text-rose-500" aria-hidden="true">*</span>
+                </label>
+                
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5" role="radiogroup" aria-labelledby="buying_timeline_label">
+                  {BUYING_TIMELINE_OPTIONS.map((opt) => {
+                    const isSelected = formData.step_1_property_goal.buying_timeline === opt.value;
+                    const isError = validationTriggered && errors.buying_timeline;
+                    return (
+                      <button
+                        type="button"
+                        key={opt.value}
+                        onClick={() => handleSingleSelectChange('step_1_property_goal', 'buying_timeline', opt.value)}
+                        aria-checked={isSelected}
+                        role="radio"
+                        className={`p-4 rounded-xl text-left transition-all border outline-none flex items-center justify-between active:scale-[0.99] cursor-pointer min-h-[50px] group focus:ring-2 focus:ring-blue-600 focus:ring-offset-1 ${
+                          isSelected
+                            ? 'border-blue-600 bg-blue-50/10 text-blue-900 font-bold shadow-sm shadow-blue-50/15'
+                            : isError
+                              ? 'border-rose-300 bg-rose-50/10 text-slate-700 hover:border-rose-400'
+                              : 'border-slate-200/90 bg-white text-slate-700 hover:border-slate-350 hover:bg-slate-50/30 font-medium'
+                        }`}
+                      >
+                        <span className="text-xs sm:text-sm leading-relaxed pr-2 group-hover:text-slate-900 transition-colors">{opt.label}</span>
+                        <span className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all flex-shrink-0 ${
+                          isSelected
+                            ? 'border-blue-600 bg-blue-600 text-white scale-110'
+                            : 'border-slate-300 bg-white group-hover:border-slate-450'
+                        }`}>
+                          {isSelected && <Check size={11} strokeWidth={4.5} />}
+                        </span>
+                      </button>
+                    );
+                  })}
                 </div>
-              )}
-            </div>
+                {validationTriggered && errors.buying_timeline && (
+                  <div className="text-rose-600 text-xs font-bold leading-tight mt-1.5 flex items-center gap-1.5 animate-fade-in" role="alert">
+                    <AlertCircle size={13} className="flex-shrink-0" />
+                    <span>{errors.buying_timeline}</span>
+                  </div>
+                )}
+              </motion.div>
+            )}
 
             {/* ACTION DOCK */}
-            <div className="pt-4 sticky bottom-0 bg-white border-t border-slate-100 py-3 px-4 -mx-6 sm:mx-0 sm:px-0 sm:border-0 sm:relative sm:-mb-2 z-20">
-              <button
-                type="button"
-                onClick={handleNext}
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-black text-sm py-4 px-6 rounded-xl shadow-lg shadow-blue-100/80 transition-all hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2.5 cursor-pointer outline-none focus:ring-3 focus:ring-blue-400 min-h-[48px]"
+            {showActionDock && (
+              <motion.div 
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3 }}
+                className={`pt-6 mt-8 border-t border-slate-150 z-30 transition-all duration-200 ${
+                  !isInputFocused 
+                    ? 'sticky bottom-0 bg-white/95 backdrop-blur-md border-t border-slate-200 py-4 px-6 -mx-6 sm:-mx-0 sm:px-0 sm:py-0 sm:relative sm:bg-transparent sm:backdrop-blur-none sm:border-t-0 shadow-[0_-8px_24px_-10px_rgba(0,0,0,0.08)] sm:shadow-none' 
+                    : 'relative bg-transparent border-t-0 py-0 px-0 sm:relative'
+                }`}
               >
-                <span>Weiter zur Machbarkeit</span>
-                <ArrowRight size={16} />
-              </button>
-            </div>
-          </div>
+                <button
+                  type="button"
+                  onClick={handleNext}
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-black text-sm py-4 px-6 rounded-xl shadow-lg shadow-blue-100/80 transition-all hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2.5 cursor-pointer outline-none focus:ring-3 focus:ring-blue-400 min-h-[48px]"
+                >
+                  <span>Weiter zur Machbarkeit</span>
+                  <ArrowRight size={16} />
+                </button>
+              </motion.div>
+            )}
+          </motion.div>
         )}
 
         {/* STEP 2: FINANZIELLE AUSGANGSLAGE */}
         {step === 2 && (
-          <div className="space-y-6 sm:space-y-8 animate-fade-in">
+          <motion.div
+            key="step-2"
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -12 }}
+            transition={{ duration: 0.22, ease: "easeInOut" }}
+            className="space-y-6 sm:space-y-8"
+          >
             
             {/* EMPLOYMENT STATUS */}
             <div className="space-y-3" data-field-key="employment_status">
@@ -1235,11 +1407,15 @@ const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onClose, title, su
             </div>
 
             {/* ACTION DOCK */}
-            <div className="pt-4 sticky bottom-0 bg-white border-t border-slate-100 py-3 px-4 -mx-6 sm:mx-0 sm:px-0 sm:border-0 sm:relative sm:-mb-2 z-20 grid grid-cols-3 gap-3">
+            <div className={`pt-6 mt-8 border-t border-slate-150 z-30 transition-all duration-200 ${
+              !isInputFocused 
+                ? 'sticky bottom-0 bg-white/95 backdrop-blur-md border-t border-slate-200 py-4 px-6 -mx-6 sm:-mx-0 sm:px-0 sm:py-0 sm:relative sm:bg-transparent sm:backdrop-blur-none sm:border-t-0 shadow-[0_-8px_24px_-10px_rgba(0,0,0,0.08)] sm:shadow-none' 
+                : 'relative bg-transparent border-t-0 py-0 px-0 sm:relative'
+            } grid grid-cols-3 gap-3`}>
               <button
                 type="button"
                 onClick={handleBack}
-                className="col-span-1 border border-slate-200 hover:border-slate-350 text-slate-600 font-bold text-xs sm:text-sm py-4 rounded-xl hover:scale-[1.01] transition-all flex items-center justify-center gap-1.5 active:scale-[0.98] bg-white cursor-pointer group outline-none focus:ring-3 focus:ring-slate-300 min-h-[48px]"
+                className="col-span-1 bg-slate-100/80 hover:bg-slate-200/80 text-slate-600 font-bold text-xs sm:text-sm py-4 rounded-xl hover:scale-[1.01] transition-all flex items-center justify-center gap-1.5 active:scale-[0.98] cursor-pointer group outline-none focus:ring-3 focus:ring-slate-300 min-h-[48px]"
               >
                 <ArrowLeft size={16} className="group-hover:-translate-x-0.5 transition-transform" />
                 <span>Zurück</span>
@@ -1253,12 +1429,19 @@ const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onClose, title, su
                 <ArrowRight size={16} />
               </button>
             </div>
-          </div>
+          </motion.div>
         )}
 
         {/* STEP 3: REGION UND PERSÖNLICHE SITUATION */}
         {step === 3 && (
-          <div className="space-y-6 sm:space-y-8 animate-fade-in">
+          <motion.div
+            key="step-3"
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -12 }}
+            transition={{ duration: 0.22, ease: "easeInOut" }}
+            className="space-y-6 sm:space-y-8"
+          >
             
             {/* CANTON SELECT */}
             <div className="space-y-3" data-field-key="canton">
@@ -1272,7 +1455,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onClose, title, su
                   id="canton_select"
                   value={formData.step_3_region_profile.canton}
                   onChange={(e) => handleSingleSelectChange('step_3_region_profile', 'canton', e.target.value)}
-                  className={`w-full bg-white border rounded-xl p-4 text-xs sm:text-sm font-bold focus:border-blue-600 outline-none transition-all text-slate-800 focus:ring-2 focus:ring-blue-600/20 appearance-none min-h-[50px] cursor-pointer ${
+                  className={`w-full bg-white border rounded-xl p-4 text-base sm:text-sm font-bold focus:border-blue-600 outline-none transition-all text-slate-800 focus:ring-2 focus:ring-blue-600/20 appearance-none min-h-[50px] cursor-pointer ${
                     validationTriggered && errors.canton ? 'border-rose-350 bg-rose-50/5' : 'border-slate-200 hover:border-slate-300'
                   }`}
                 >
@@ -1308,10 +1491,11 @@ const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onClose, title, su
                 pattern="[0-9]*"
                 inputMode="numeric"
                 maxLength={4}
+                autoComplete="postal-code"
                 placeholder="z.B. 9000"
                 value={formData.step_3_region_profile.zip_code}
                 onChange={(e) => handleTextChange('step_3_region_profile', 'zip_code', e.target.value.replace(/[^0-9]/g, ''))}
-                className={`w-full bg-white border rounded-xl p-4 text-xs sm:text-sm font-bold focus:border-blue-600 outline-none transition-all text-slate-800 focus:ring-2 focus:ring-blue-600/20 placeholder:text-slate-350 min-h-[50px] ${
+                className={`w-full bg-white border rounded-xl p-4 text-base sm:text-sm font-bold focus:border-blue-600 outline-none transition-all text-slate-800 focus:ring-2 focus:ring-blue-600/20 placeholder:text-slate-350 min-h-[50px] ${
                   validationTriggered && errors.zip_code ? 'border-rose-350 bg-rose-50/5' : 'border-slate-200 hover:border-slate-300'
                 }`}
               />
@@ -1463,11 +1647,15 @@ const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onClose, title, su
             </div>
 
             {/* ACTION DOCK */}
-            <div className="pt-4 sticky bottom-0 bg-white border-t border-slate-100 py-3 px-4 -mx-6 sm:mx-0 sm:px-0 sm:border-0 sm:relative sm:-mb-2 z-20 grid grid-cols-3 gap-3">
+            <div className={`pt-6 mt-8 border-t border-slate-150 z-30 transition-all duration-200 ${
+              !isInputFocused 
+                ? 'sticky bottom-0 bg-white/95 backdrop-blur-md border-t border-slate-200 py-4 px-6 -mx-6 sm:-mx-0 sm:px-0 sm:py-0 sm:relative sm:bg-transparent sm:backdrop-blur-none sm:border-t-0 shadow-[0_-8px_24px_-10px_rgba(0,0,0,0.08)] sm:shadow-none' 
+                : 'relative bg-transparent border-t-0 py-0 px-0 sm:relative'
+            } grid grid-cols-3 gap-3`}>
               <button
                 type="button"
                 onClick={handleBack}
-                className="col-span-1 border border-slate-200 hover:border-slate-350 text-slate-600 font-bold text-xs sm:text-sm py-4 rounded-xl hover:scale-[1.01] transition-all flex items-center justify-center gap-1.5 active:scale-[0.98] bg-white cursor-pointer group outline-none focus:ring-3 focus:ring-slate-300 min-h-[48px]"
+                className="col-span-1 bg-slate-100/80 hover:bg-slate-200/80 text-slate-600 font-bold text-xs sm:text-sm py-4 rounded-xl hover:scale-[1.01] transition-all flex items-center justify-center gap-1.5 active:scale-[0.98] cursor-pointer group outline-none focus:ring-3 focus:ring-slate-300 min-h-[48px]"
               >
                 <ArrowLeft size={16} className="group-hover:-translate-x-0.5 transition-transform" />
                 <span>Zurück</span>
@@ -1481,12 +1669,19 @@ const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onClose, title, su
                 <ArrowRight size={16} />
               </button>
             </div>
-          </div>
+          </motion.div>
         )}
 
         {/* STEP 4: KONTAKTANGABEN */}
         {step === 4 && (
-          <div className="space-y-6 sm:space-y-8 animate-fade-in">
+          <motion.div
+            key="step-4"
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -12 }}
+            transition={{ duration: 0.22, ease: "easeInOut" }}
+            className="space-y-6 sm:space-y-8"
+          >
             
             {/* FIRST NAME AND LAST NAME */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -1495,10 +1690,11 @@ const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onClose, title, su
                 <input
                   id="first_name_input"
                   type="text"
+                  autoComplete="given-name"
                   placeholder="Max"
                   value={formData.step_4_contact.first_name}
                   onChange={(e) => handleTextChange('step_4_contact', 'first_name', e.target.value)}
-                  className={`w-full bg-white border rounded-xl p-4 text-xs sm:text-sm font-bold focus:border-blue-600 outline-none transition-all focus:ring-2 focus:ring-blue-600/20 text-slate-800 min-h-[48px] ${
+                  className={`w-full bg-white border rounded-xl p-4 text-base sm:text-sm font-bold focus:border-blue-600 outline-none transition-all focus:ring-2 focus:ring-blue-600/20 text-slate-800 min-h-[48px] ${
                     validationTriggered && errors.first_name ? 'border-rose-350 bg-rose-50/5' : 'border-slate-200 hover:border-slate-300'
                   }`}
                 />
@@ -1511,10 +1707,11 @@ const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onClose, title, su
                 <input
                   id="last_name_input"
                   type="text"
+                  autoComplete="family-name"
                   placeholder="Muster"
                   value={formData.step_4_contact.last_name}
                   onChange={(e) => handleTextChange('step_4_contact', 'last_name', e.target.value)}
-                  className={`w-full bg-white border rounded-xl p-4 text-xs sm:text-sm font-bold focus:border-blue-600 outline-none transition-all focus:ring-2 focus:ring-blue-600/20 text-slate-800 min-h-[48px] ${
+                  className={`w-full bg-white border rounded-xl p-4 text-base sm:text-sm font-bold focus:border-blue-600 outline-none transition-all focus:ring-2 focus:ring-blue-600/20 text-slate-800 min-h-[48px] ${
                     validationTriggered && errors.last_name ? 'border-rose-350 bg-rose-50/5' : 'border-slate-200 hover:border-slate-300'
                   }`}
                 />
@@ -1531,10 +1728,12 @@ const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onClose, title, su
                 <input
                   id="email_input"
                   type="email"
+                  inputMode="email"
+                  autoComplete="email"
                   placeholder="max@beispiel.ch"
                   value={formData.step_4_contact.email}
                   onChange={(e) => handleTextChange('step_4_contact', 'email', e.target.value)}
-                  className={`w-full bg-white border rounded-xl p-4 text-xs sm:text-sm font-bold focus:border-blue-600 outline-none transition-all focus:ring-2 focus:ring-blue-600/20 text-slate-800 min-h-[48px] ${
+                  className={`w-full bg-white border rounded-xl p-4 text-base sm:text-sm font-bold focus:border-blue-600 outline-none transition-all focus:ring-2 focus:ring-blue-600/20 text-slate-800 min-h-[48px] ${
                     validationTriggered && errors.email ? 'border-rose-350 bg-rose-50/5' : 'border-slate-200 hover:border-slate-300'
                   }`}
                 />
@@ -1548,10 +1747,12 @@ const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onClose, title, su
                 <input
                   id="phone_input"
                   type="tel"
+                  inputMode="tel"
+                  autoComplete="tel"
                   placeholder="079 123 45 67"
                   value={formData.step_4_contact.phone}
                   onChange={(e) => handleTextChange('step_4_contact', 'phone', e.target.value)}
-                  className={`w-full bg-white border rounded-xl p-4 text-xs sm:text-sm font-bold focus:border-blue-600 outline-none transition-all focus:ring-2 focus:ring-blue-600/20 text-slate-800 min-h-[48px] ${
+                  className={`w-full bg-white border rounded-xl p-4 text-base sm:text-sm font-bold focus:border-blue-600 outline-none transition-all focus:ring-2 focus:ring-blue-600/20 text-slate-800 min-h-[48px] ${
                     validationTriggered && errors.phone ? 'border-rose-350 bg-rose-50/5' : 'border-slate-200 hover:border-slate-300'
                   }`}
                 />
@@ -1647,8 +1848,81 @@ const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onClose, title, su
                 maxLength={1000}
                 value={formData.step_4_contact.message}
                 onChange={(e) => handleTextChange('step_4_contact', 'message', e.target.value)}
-                className="w-full bg-white border border-slate-200 rounded-xl p-4 text-xs sm:text-sm font-semibold focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 outline-none transition-all placeholder:text-slate-350 min-h-[100px] max-h-[220px] text-slate-800 leading-relaxed"
+                className="w-full bg-white border border-slate-200 rounded-xl p-4 text-base sm:text-sm font-semibold focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 outline-none transition-all placeholder:text-slate-350 min-h-[100px] max-h-[220px] text-slate-800 leading-relaxed"
               />
+            </div>
+
+            {/* TRUST SIGNALS & EXPECTATION CONTROL BEFORE SUBMITTING */}
+            <div className="bg-gradient-to-br from-blue-50/50 to-amber-50/20 border border-blue-100/60 rounded-2xl p-5 space-y-4 mb-2 shadow-sm">
+              {/* Star Rating & Stat */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-150/50">
+                <div className="flex items-center gap-1.5">
+                  <div className="flex text-amber-500">
+                    {[...Array(5)].map((_, i) => (
+                      <svg key={i} className="w-4 h-4 fill-current" viewBox="0 0 20 20">
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                      </svg>
+                    ))}
+                  </div>
+                  <span className="text-xs font-extrabold text-slate-800">4.9 / 5 Sterne</span>
+                </div>
+                <span className="text-[11px] font-black text-slate-500 bg-slate-100/80 px-2.5 py-1 rounded-full border border-slate-200/40">
+                  Über 5'000 begleitete Paare in der Schweiz
+                </span>
+              </div>
+
+              {/* Next Steps Details */}
+              <div className="space-y-3">
+                <div className="flex items-center gap-2">
+                  <div className="w-1.5 h-1.5 rounded-full bg-[#F87101]" />
+                  <h4 className="text-xs font-black uppercase tracking-wider text-slate-800">Was passiert nach dem Absenden?</h4>
+                </div>
+                
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 text-xs leading-relaxed">
+                  <div className="flex items-start gap-2.5">
+                    <div className="w-5 h-5 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <Check size={11} strokeWidth={3} />
+                    </div>
+                    <div>
+                      <p className="font-extrabold text-slate-800">1. Kostenlose Analyse</p>
+                      <p className="text-[11px] text-slate-500 font-medium mt-0.5">Wir prüfen deine Angaben vertraulich und berechnen deine reale Machbarkeit.</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-2.5">
+                    <div className="w-5 h-5 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <Check size={11} strokeWidth={3} />
+                    </div>
+                    <div>
+                      <p className="font-extrabold text-slate-800">2. Einschätzung in 1-2 Tagen</p>
+                      <p className="text-[11px] text-slate-500 font-medium mt-0.5">Du erhältst deine ehrliche und transparente Einschätzung direkt per Telefon.</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-2.5 sm:col-span-2 border-t border-slate-100 pt-2.5">
+                    <div className="w-5 h-5 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <Check size={11} strokeWidth={3} />
+                    </div>
+                    <div>
+                      <p className="font-extrabold text-slate-800">3. 100% unverbindlich & kein Verkaufsdruck</p>
+                      <p className="text-[11px] text-slate-500 font-medium mt-0.5">Keine Abopflicht, keine versteckten Gebühren. Du entscheidest selbst, ob du weitermachen möchtest.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* MINI TESTIMONIAL BANNER */}
+              <div className="border-t border-slate-100 pt-3 flex gap-3.5 items-start">
+                <div className="w-9 h-9 rounded-full bg-slate-100 overflow-hidden flex-shrink-0 border border-slate-200">
+                  <img referrerPolicy="no-referrer" src="https://raw.githubusercontent.com/yathur-hub/EigenheimNavi-BrandAssets/main/Buob-Familie.jpg" alt="Familie Buob" className="w-full h-full object-cover" />
+                </div>
+                <div className="space-y-0.5">
+                  <span className="text-[10px] font-extrabold text-slate-800 block">Familie Buob, Ostschweiz</span>
+                  <p className="text-[10px] text-slate-500 font-semibold leading-normal italic">
+                    "Der Realitätscheck gab uns endlich Klarheit. Kein Verkaufsdruck, sondern ein ehrliches, professionelles Gespräch auf Augenhöhe."
+                  </p>
+                </div>
+              </div>
             </div>
 
             {/* CONSENTS AND AGREEMENTS */}
@@ -1656,14 +1930,14 @@ const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onClose, title, su
               
               {/* PRIVACY CONSENT */}
               <div data-field-key="privacy_consent" className="space-y-1.5">
-                <label className="flex items-start gap-4 cursor-pointer select-none group">
+                <label className="flex items-start gap-4 cursor-pointer select-none group py-1.5">
                   <div className="relative flex items-center">
                     <input
                       id="privacy_consent_cb"
                       type="checkbox"
                       checked={formData.step_4_contact.privacy_consent}
                       onChange={(e) => handleTextChange('step_4_contact', 'privacy_consent', e.target.checked)}
-                      className={`w-5 h-5 rounded border-2 text-blue-600 focus:ring-blue-500 cursor-pointer ${
+                      className={`w-5 h-5 rounded border-2 text-blue-600 focus:ring-blue-550 cursor-pointer ${
                         validationTriggered && errors.privacy_consent ? 'border-rose-450 bg-rose-50' : 'border-slate-300'
                       }`}
                     />
@@ -1679,7 +1953,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onClose, title, su
 
               {/* MARKETING CONSENT */}
               <div className="space-y-1.5">
-                <label className="flex items-start gap-4 cursor-pointer select-none group">
+                <label className="flex items-start gap-4 cursor-pointer select-none group py-1.5">
                   <div className="relative flex items-center">
                     <input
                       id="marketing_consent_cb"
@@ -1710,12 +1984,16 @@ const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onClose, title, su
             )}
 
             {/* ACTION DOCK & STICKY NAVIGATION AREA */}
-            <div className="pt-4 sticky bottom-0 bg-white border-t border-slate-100 py-3 px-4 -mx-6 sm:mx-0 sm:px-0 sm:border-0 sm:relative sm:-mb-2 z-20 grid grid-cols-3 gap-3">
+            <div className={`pt-6 mt-8 border-t border-slate-150 z-30 transition-all duration-200 ${
+              !isInputFocused 
+                ? 'sticky bottom-0 bg-white/95 backdrop-blur-md border-t border-slate-200 py-4 px-6 -mx-6 sm:-mx-0 sm:px-0 sm:py-0 sm:relative sm:bg-transparent sm:backdrop-blur-none sm:border-t-0 shadow-[0_-8px_24px_-10px_rgba(0,0,0,0.08)] sm:shadow-none' 
+                : 'relative bg-transparent border-t-0 py-0 px-0 sm:relative'
+            } grid grid-cols-3 gap-3`}>
               <button
                 type="button"
                 disabled={isSubmitting}
                 onClick={handleBack}
-                className="col-span-1 border border-slate-200 hover:border-slate-350 text-slate-600 font-bold text-xs sm:text-sm py-4 rounded-xl hover:scale-[1.01] transition-all flex items-center justify-center gap-1.5 active:scale-[0.98] bg-white cursor-pointer group outline-none focus:ring-3 focus:ring-slate-300 min-h-[48px]"
+                className="col-span-1 bg-slate-100/80 hover:bg-slate-200/80 text-slate-600 font-bold text-xs sm:text-sm py-4 rounded-xl hover:scale-[1.01] transition-all flex items-center justify-center gap-1.5 active:scale-[0.98] cursor-pointer group outline-none focus:ring-3 focus:ring-slate-300 min-h-[48px]"
               >
                 <ArrowLeft size={16} className="group-hover:-translate-x-0.5 transition-transform" />
                 <span>Zurück</span>
@@ -1724,7 +2002,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onClose, title, su
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="col-span-2 bg-blue-650 bg-blue-600 hover:bg-blue-750 hover:bg-blue-700 text-white font-black text-xs sm:text-sm py-4 rounded-xl shadow-lg shadow-blue-100/90 transition-all hover:scale-[1.01] active:scale-[0.99] disabled:opacity-40 flex items-center justify-center gap-2 cursor-pointer outline-none focus:ring-3 focus:ring-blue-400 min-h-[48px]"
+                className="col-span-2 bg-[#F87101] hover:bg-[#e06101] text-white font-black text-xs sm:text-sm py-4 rounded-xl shadow-lg shadow-orange-500/25 transition-all hover:scale-[1.01] active:scale-[0.99] disabled:opacity-40 flex items-center justify-center gap-2 cursor-pointer outline-none focus:ring-3 focus:ring-orange-400 min-h-[48px]"
               >
                 {isSubmitting ? (
                   <>
@@ -1736,13 +2014,13 @@ const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onClose, title, su
                   </>
                 ) : (
                   <>
-                    <span>Eigenheim-Check absenden</span>
+                    <span>Kostenlosen Check jetzt abschliessen</span>
                     <ArrowRight size={16} />
                   </>
                 )}
               </button>
             </div>
-          </div>
+          </motion.div>
         )}
 
       </form>

@@ -31,16 +31,6 @@ const Header: React.FC<HeaderProps> = ({ onStartCheck }) => {
             Erstgespräch buchen
           </button>
         </div>
-
-        {/* Mobile Button */}
-        <div className="md:hidden">
-           <button 
-            onClick={onStartCheck}
-            className="bg-blue-600 text-white px-5 py-2.5 rounded-[14px] text-xs font-black shadow-md active:scale-95 transition-all"
-           >
-             Buchen
-           </button>
-        </div>
       </div>
     </header>
   );
