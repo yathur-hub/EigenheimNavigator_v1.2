@@ -511,7 +511,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onClose, title, su
     
     if (currentQ && currentQ.type !== 'final_submit') {
       track('wizard_question_answered', {
-        step: currentQ.step,
+        step_number: currentQ.step,
         category: currentQ.category,
         field_key: currentQ.fieldKey,
         question_title: currentQ.title
@@ -1095,7 +1095,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onClose, title, su
       .filter((q) => q.step === step && q.type !== 'final_submit')
       .forEach((q) => {
         track(stepErrors[q.fieldKey] ? 'wizard_question_skipped' : 'wizard_question_answered', {
-          step,
+          step_number: step,
           category: q.category,
           field_key: q.fieldKey,
           question_title: q.title
@@ -1162,7 +1162,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onClose, title, su
         .filter((q) => q.step === 4 && q.type !== 'final_submit')
         .forEach((q) => {
           track(step4Errors[q.fieldKey] ? 'wizard_question_skipped' : 'wizard_question_answered', {
-            step: 4,
+            step_number: 4,
             category: q.category,
             field_key: q.fieldKey,
             question_title: q.title
@@ -1615,7 +1615,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onClose, title, su
     const errorText = currentQ.validate(formData);
     if (errorText) {
       track('wizard_question_skipped', {
-        step: currentQ.step,
+        step_number: currentQ.step,
         category: currentQ.category,
         field_key: currentQ.fieldKey,
         question_title: currentQ.title
