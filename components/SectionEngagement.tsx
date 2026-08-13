@@ -15,7 +15,10 @@ function pushEngagement(sectionId: string, elapsedMs: number) {
   if (typeof window === 'undefined') return;
   const dataLayer = (window as any).dataLayer;
   if (dataLayer && Array.isArray(dataLayer)) {
-    dataLayer.push({ event: 'section_engagement', section_id: sectionId, engagement_time_msec: Math.round(elapsedMs) });
+    // Nicht "engagement_time_msec" nennen: GA4 reserviert diesen Parameternamen
+    // fuer sein eigenes automatisches Engagement-Tracking, ein Custom Metric
+    // mit diesem Namen laesst sich in GA4 nicht anlegen.
+    dataLayer.push({ event: 'section_engagement', section_id: sectionId, section_engagement_msec: Math.round(elapsedMs) });
   }
 }
 
