@@ -186,12 +186,11 @@ const PREFERRED_REGION_OPTIONS = [
 ];
 
 const AGE_RANGE_OPTIONS = [
-  { value: 'under_25', label: 'Unter 25', score: -20 },
-  { value: '25_27', label: '25–27', score: 5 },
-  { value: '28_34', label: '28–34', score: 25 },
-  { value: '35_44', label: '35–44', score: 25 },
-  { value: '45_54', label: '45–54', score: 5 },
-  { value: '55_plus', label: '55+', score: -10 }
+  { value: '22_28', label: '22–28', score: 15 },
+  { value: '28_35', label: '28–35', score: 25 },
+  { value: '35_45', label: '35–45', score: 25 },
+  { value: '45_55', label: '45–55', score: 15 },
+  { value: '55_plus', label: '55+', score: 5 }
 ];
 
 const CURRENT_SITUATION_OPTIONS = [
@@ -302,12 +301,11 @@ const REACTION_MAPPING: Record<string, Record<string, string>> = {
     undecided: "Alles klar, wir halten den Check flexibel für dich."
   },
   age_range: {
-    under_25: "Jung und ambitioniert. Frühzeitige Planung zahlt sich aus.",
-    "25_27": "Der perfekte Zeitpunkt, um den Grundstein zu legen.",
-    "28_34": "Ideale Altersgruppe für den ersten Schritt ins Eigenheim.",
-    "35_44": "Beste Lebensphase, um Wohnträume langfristig zu verwirklichen.",
-    "45_54": "Lebenserfahren. Wir richten die Finanzierung optimal aus.",
-    "55_plus": "Vorausschauend. Wir planen die passende Wohnlösung für dich."
+    "22_28": "Jung und dynamisch. Frühzeitige Planung zahlt sich aus.",
+    "28_35": "Der perfekte Lebensabschnitt für den ersten Schritt ins Eigenheim.",
+    "35_45": "Beste Lebensphase, um Wohnträume langfristig zu verwirklichen.",
+    "45_55": "Lebenserfahren. Wir richten die Finanzierung optimal aus.",
+    "55_plus": "Vorausschauend. Wir planen die passende Wohnlösung für euch."
   },
   current_situation: {
     renting: "Mietverhältnis — der klassische Ausgangspunkt fürs Wohneigentum.",
@@ -509,19 +507,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onClose, title, su
     const currentQ = MOBILE_QUESTIONS[mobileQuestionIndex];
     const nextQ = MOBILE_QUESTIONS[nextIndex];
     
-    if (currentQ && currentQ.type !== 'final_submit') {
-      track('wizard_question_answered', {
-        step_number: currentQ.step,
-        category: currentQ.category,
-        field_key: currentQ.fieldKey,
-        question_title: currentQ.title
-      });
-    }
-
     if (nextQ && currentQ && currentQ.category !== nextQ.category) {
-      // Mirrors the desktop `form_step${step}_complete` event (fired in handleNext),
-      // which the mobile one-question-per-screen flow otherwise never triggers.
-      track(`form_step${currentQ.step}_complete`, { formDataStep: formData });
       setInterstitial({
         completedCategory: currentQ.category,
         nextCategory: nextQ.category,
@@ -551,7 +537,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onClose, title, su
     const s3 = formData.step_3_region_profile;
     const s4 = formData.step_4_contact;
 
-    const totalRequired = 17;
+    const totalRequired = 15;
     let answered = 0;
 
     // Step 1: Eigenheimwunsch (3 Pflichtfragen)
@@ -559,10 +545,9 @@ const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onClose, title, su
     if (s1.property_type && s1.property_type.length > 0) answered++;
     if (s1.buying_timeline) answered++;
 
-    // Step 2: Finanzen (3 Pflichtfragen - household_income_range ist optional)
+    // Step 2: Finanzen (2 Pflichtfragen - household_income_range ist optional)
     if (s2.employment_status) answered++;
     if (s2.own_funds_range) answered++;
-    if (s2.financing_status) answered++;
 
     // Step 3: Region & Situation (5 Pflichtfragen)
     if (s3.canton) answered++;
@@ -571,7 +556,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onClose, title, su
     if (s3.age_range) answered++;
     if (s3.current_situation) answered++;
 
-    // Step 4: Kontaktdaten (6 Pflichtfragen - message und preferred_contact_time sind optional)
+    // Step 4: Kontaktdaten (5 Pflichtfragen - message und preferred_contact_time sind optional)
     if (s4.first_name && s4.first_name.trim().length >= 2) answered++;
     if (s4.last_name && s4.last_name.trim().length >= 2) answered++;
     if (s4.email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s4.email.trim())) answered++;
@@ -583,7 +568,6 @@ const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onClose, title, su
     else if (phoneClean.startsWith('0')) isPhoneValid = /^0[1-9]\d{8}$/.test(phoneClean);
     if (isPhoneValid) answered++;
 
-    if (s4.consultation_interest) answered++;
     if (s4.privacy_consent) answered++;
 
     const percent = Math.round((answered / totalRequired) * 100);
@@ -647,7 +631,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onClose, title, su
       const s3 = formData.step_3_region_profile;
       const s4 = formData.step_4_contact;
 
-      const totalRequired = 17;
+      const totalRequired = 15;
       let answered = 0;
 
       // Step 1: Eigenheimwunsch (3 Pflichtfragen)
@@ -655,10 +639,9 @@ const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onClose, title, su
       if (s1.property_type && s1.property_type.length > 0) answered++;
       if (s1.buying_timeline) answered++;
 
-      // Step 2: Finanzen (3 Pflichtfragen)
+      // Step 2: Finanzen (2 Pflichtfragen)
       if (s2.employment_status) answered++;
       if (s2.own_funds_range) answered++;
-      if (s2.financing_status) answered++;
 
       // Step 3: Region & Situation (5 Pflichtfragen)
       if (s3.canton) answered++;
@@ -667,7 +650,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onClose, title, su
       if (s3.age_range) answered++;
       if (s3.current_situation) answered++;
 
-      // Step 4: Kontaktdaten (6 Pflichtfragen)
+      // Step 4: Kontaktdaten (5 Pflichtfragen)
       if (s4.first_name && s4.first_name.trim().length >= 2) answered++;
       if (s4.last_name && s4.last_name.trim().length >= 2) answered++;
       if (s4.email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s4.email.trim())) answered++;
@@ -679,7 +662,6 @@ const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onClose, title, su
       else if (phoneClean.startsWith('0')) isPhoneValid = /^0[1-9]\d{8}$/.test(phoneClean);
       if (isPhoneValid) answered++;
 
-      if (s4.consultation_interest) answered++;
       if (s4.privacy_consent) answered++;
 
       const remaining = Math.max(0, totalRequired - answered);
@@ -754,9 +736,6 @@ const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onClose, title, su
     if (!data.step_2_financial_situation.own_funds_range) {
       errorMap.own_funds_range = 'Bitte wähle eine Option aus.';
     }
-    if (!data.step_2_financial_situation.financing_status) {
-      errorMap.financing_status = 'Bitte wähle eine Option aus.';
-    }
     return errorMap;
   };
 
@@ -821,9 +800,6 @@ const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onClose, title, su
       errorMap.phone = 'Bitte gib eine gültige Telefonnummer ein.';
     }
 
-    if (!data.step_4_contact.consultation_interest) {
-      errorMap.consultation_interest = 'Bitte wähle eine Option aus.';
-    }
     if (!data.step_4_contact.privacy_consent) {
       errorMap.privacy_consent = 'Bitte bestätige die Datenschutzerklärung.';
     }
@@ -937,12 +913,16 @@ const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onClose, title, su
     };
 
     const ageRangeScores: Record<string, number> = {
+      '22_28': 15,
+      '28_35': 25,
+      '35_45': 25,
+      '45_55': 15,
+      '55_plus': 5,
       under_25: -20,
       '25_27': 5,
       '28_34': 25,
       '35_44': 25,
-      '45_54': 5,
-      '55_plus': -10
+      '45_54': 5
     };
 
     const currentSituationScores: Record<string, number> = {
@@ -1016,7 +996,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onClose, title, su
     let disqualification_reason: string | null = null;
     if (s1.property_goal === 'no_current_goal') {
       disqualification_reason = 'no_current_property_goal';
-    } else if (s4.consultation_interest === 'no') {
+    } else if (s4.consultation_interest && s4.consultation_interest === 'no') {
       disqualification_reason = 'no_consultation_interest';
     } else if (s2.employment_status === 'not_employed') {
       disqualification_reason = 'not_currently_employed';
@@ -1091,17 +1071,6 @@ const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onClose, title, su
 
     setErrors(stepErrors);
 
-    MOBILE_QUESTIONS
-      .filter((q) => q.step === step && q.type !== 'final_submit')
-      .forEach((q) => {
-        track(stepErrors[q.fieldKey] ? 'wizard_question_skipped' : 'wizard_question_answered', {
-          step_number: step,
-          category: q.category,
-          field_key: q.fieldKey,
-          question_title: q.title
-        });
-      });
-
     if (Object.keys(stepErrors).length === 0) {
       track(`form_step${step}_complete`, { formDataStep: formData });
       
@@ -1157,17 +1126,6 @@ const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onClose, title, su
     } else {
       const step4Errors = validateStep4(formData);
       setErrors(step4Errors);
-
-      MOBILE_QUESTIONS
-        .filter((q) => q.step === 4 && q.type !== 'final_submit')
-        .forEach((q) => {
-          track(step4Errors[q.fieldKey] ? 'wizard_question_skipped' : 'wizard_question_answered', {
-            step_number: 4,
-            category: q.category,
-            field_key: q.fieldKey,
-            question_title: q.title
-          });
-        });
 
       if (Object.keys(step4Errors).length > 0) {
         console.warn("Validation failed for step 4", step4Errors);
@@ -1400,23 +1358,12 @@ const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onClose, title, su
       id: 'own_funds_range',
       category: 'Finanzen',
       step: 2,
-      title: 'Wie viel Eigenkapital steht dir ungefähr zur Verfügung?',
+      title: 'Wie viel Eigenkapital steht dir ungefähr zur Verfügung? (exkl. Pensionskasse)',
       type: 'single_select',
       fieldGroup: 'step_2_financial_situation',
       fieldKey: 'own_funds_range',
       options: OWN_FUNDS_OPTIONS,
       validate: (data) => !data.step_2_financial_situation.own_funds_range ? 'Bitte wähle eine Option aus.' : null
-    },
-    {
-      id: 'financing_status',
-      category: 'Finanzen',
-      step: 2,
-      title: 'Hast du deine Finanzierung bereits geprüft?',
-      type: 'single_select',
-      fieldGroup: 'step_2_financial_situation',
-      fieldKey: 'financing_status',
-      options: FINANCING_STATUS_OPTIONS,
-      validate: (data) => !data.step_2_financial_situation.financing_status ? 'Bitte wähle eine Option aus.' : null
     },
     {
       id: 'household_income_range',
@@ -1470,7 +1417,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onClose, title, su
       id: 'age_range',
       category: 'Region & Situation',
       step: 3,
-      title: 'Wie alt bist du?',
+      title: 'In welcher Altersgruppe seid ihr?',
       type: 'single_select',
       fieldGroup: 'step_3_region_profile',
       fieldKey: 'age_range',
@@ -1551,17 +1498,6 @@ const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onClose, title, su
       }
     },
     {
-      id: 'consultation_interest',
-      category: 'Kontaktdaten',
-      step: 4,
-      title: 'Möchtest du eine persönliche Einschätzung?',
-      type: 'single_select',
-      fieldGroup: 'step_4_contact',
-      fieldKey: 'consultation_interest',
-      options: CONSULTATION_INTEREST_OPTIONS,
-      validate: (data) => !data.step_4_contact.consultation_interest ? 'Bitte wähle eine Option aus.' : null
-    },
-    {
       id: 'preferred_contact_time',
       category: 'Kontaktdaten',
       step: 4,
@@ -1614,12 +1550,6 @@ const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onClose, title, su
     const currentQ = MOBILE_QUESTIONS[mobileQuestionIndex];
     const errorText = currentQ.validate(formData);
     if (errorText) {
-      track('wizard_question_skipped', {
-        step_number: currentQ.step,
-        category: currentQ.category,
-        field_key: currentQ.fieldKey,
-        question_title: currentQ.title
-      });
       setErrors({ [currentQ.fieldKey]: errorText });
       setValidationTriggered(true);
       return;
@@ -2144,7 +2074,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onClose, title, su
     const s4 = formData.step_4_contact;
 
     const cat1Completed = !!(s1.property_goal && s1.property_type && s1.property_type.length > 0 && s1.buying_timeline);
-    const cat2Completed = !!(s2.employment_status && s2.own_funds_range && s2.financing_status);
+    const cat2Completed = !!(s2.employment_status && s2.own_funds_range);
     const cat3Completed = !!(s3.canton && s3.zip_code && /^[0-9]{4}$/.test(s3.zip_code.trim()) && s3.preferred_region && s3.preferred_region.length > 0 && s3.age_range && s3.current_situation);
 
     const phoneClean = s4.phone.replace(/[^\d+]/g, '');
@@ -2158,7 +2088,6 @@ const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onClose, title, su
       s4.last_name && s4.last_name.trim().length >= 2 &&
       s4.email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s4.email.trim()) &&
       isPhoneValid &&
-      s4.consultation_interest &&
       s4.privacy_consent
     );
 
@@ -2843,7 +2772,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onClose, title, su
             {/* OWN FUNDS RANGE */}
             <div className="space-y-3" data-field-key="own_funds_range">
               <label id="own_funds_label" className="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1 uppercase tracking-wider">
-                <span>Wie viel Eigenkapital steht dir ungefähr zur Verfügung?</span>
+                <span>Wie viel Eigenkapital steht dir ungefähr zur Verfügung? (exkl. Pensionskasse)</span>
                 <span className="text-rose-500" aria-hidden="true">*</span>
               </label>
               
@@ -2897,67 +2826,6 @@ const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onClose, title, su
                 <div className="text-rose-600 text-xs font-bold leading-none mt-1.5 flex items-center gap-1.5 animate-fade-in" role="alert">
                   <AlertCircle size={13} className="flex-shrink-0" />
                   <span>{errors.own_funds_range}</span>
-                </div>
-              )}
-            </div>
-
-            {/* FINANCING STATUS */}
-            <div className="space-y-3" data-field-key="financing_status">
-              <label id="financing_checked_label" className="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1 uppercase tracking-wider">
-                <span>Hast du deine Finanzierung bereits geprüft?</span>
-                <span className="text-rose-500" aria-hidden="true">*</span>
-              </label>
-              
-              <div className="grid grid-cols-1 gap-2.5" role="radiogroup" aria-labelledby="financing_checked_label">
-                {FINANCING_STATUS_OPTIONS.map((opt) => {
-                  const isSelected = formData.step_2_financial_situation.financing_status === opt.value;
-                  const isError = validationTriggered && errors.financing_status;
-                  return (
-                    <motion.button
-                      type="button"
-                      key={opt.value}
-                      onClick={() => handleSingleSelectChange('step_2_financial_situation', 'financing_status', opt.value)}
-                      aria-checked={isSelected}
-                      role="radio"
-                      animate={isSelected && !prefersReduced ? { scale: [1, 1.03, 1] } : { scale: 1 }}
-                      transition={{ duration: 0.2, ease: "easeOut" }}
-                      className={`w-full p-4 rounded-xl text-left transition-all border outline-none flex items-center justify-between active:scale-[0.99] cursor-pointer min-h-[50px] group focus:ring-2 focus:ring-blue-600 focus:ring-offset-1 ${
-                        isSelected
-                          ? 'border-blue-600 bg-blue-50/10 text-blue-900 font-bold shadow-sm shadow-blue-50/15'
-                          : isError
-                            ? 'border-rose-300 bg-rose-50/10 text-slate-700 hover:border-rose-400'
-                            : 'border-slate-200/90 bg-white text-slate-700 hover:border-slate-350 hover:bg-slate-50/30 font-medium'
-                      }`}
-                    >
-                      <span className="text-xs sm:text-sm leading-relaxed pr-3 group-hover:text-slate-900 transition-colors">{opt.label}</span>
-                      <span className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all flex-shrink-0 ${
-                        isSelected
-                          ? 'border-blue-600 bg-blue-600 text-white'
-                          : 'border-slate-300 bg-white group-hover:border-slate-450'
-                      }`}>
-                        <AnimatePresence>
-                          {isSelected && (
-                            <motion.span
-                              initial={{ scale: 0 }}
-                              animate={{ scale: 1 }}
-                              exit={{ scale: 0 }}
-                              transition={{ type: "spring", stiffness: 400, damping: 12 }}
-                              className="flex items-center justify-center"
-                            >
-                              <Check size={11} strokeWidth={4.5} />
-                            </motion.span>
-                          )}
-                        </AnimatePresence>
-                      </span>
-                    </motion.button>
-                  );
-                })}
-              </div>
-              {renderInlineConfirm('financing_status')}
-              {validationTriggered && errors.financing_status && (
-                <div className="text-rose-600 text-xs font-bold leading-none mt-1.5 flex items-center gap-1.5 animate-fade-in" role="alert">
-                  <AlertCircle size={13} className="flex-shrink-0" />
-                  <span>{errors.financing_status}</span>
                 </div>
               )}
             </div>
@@ -3189,11 +3057,11 @@ const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onClose, title, su
             {/* AGE RANGE OPTIONS */}
             <div className="space-y-3" data-field-key="age_range">
               <label id="age_range_label" className="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1 uppercase tracking-wider">
-                <span>Wie alt bist du?</span>
+                <span>In welcher Altersgruppe seid ihr?</span>
                 <span className="text-rose-500" aria-hidden="true">*</span>
               </label>
               
-              <div className="grid grid-cols-2 sm:grid-cols-6 gap-2" role="radiogroup" aria-labelledby="age_range_label">
+              <div className="grid grid-cols-2 sm:grid-cols-5 gap-2" role="radiogroup" aria-labelledby="age_range_label">
                 {AGE_RANGE_OPTIONS.map((opt) => {
                   const isSelected = formData.step_3_region_profile.age_range === opt.value;
                   const isError = validationTriggered && errors.age_range;
@@ -3416,67 +3284,6 @@ const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onClose, title, su
                   <p className="text-rose-600 text-xs font-bold leading-tight mt-1 flex items-center gap-1 animate-fade-in" role="alert">{errors.phone}</p>
                 )}
               </div>
-            </div>
-
-            {/* CONSULTATION INTEREST */}
-            <div className="space-y-3" data-field-key="consultation_interest">
-              <label id="consultation_interest_label" className="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1 uppercase tracking-wider">
-                <span>Möchtest du eine persönliche Einschätzung?</span>
-                <span className="text-rose-500" aria-hidden="true">*</span>
-              </label>
-              
-              <div className="grid grid-cols-1 gap-2.5" role="radiogroup" aria-labelledby="consultation_interest_label">
-                {CONSULTATION_INTEREST_OPTIONS.map((opt) => {
-                  const isSelected = formData.step_4_contact.consultation_interest === opt.value;
-                  const isError = validationTriggered && errors.consultation_interest;
-                  return (
-                    <motion.button
-                      type="button"
-                      key={opt.value}
-                      onClick={() => handleSingleSelectChange('step_4_contact', 'consultation_interest', opt.value)}
-                      aria-checked={isSelected}
-                      role="radio"
-                      animate={isSelected && !prefersReduced ? { scale: [1, 1.03, 1] } : { scale: 1 }}
-                      transition={{ duration: 0.2, ease: "easeOut" }}
-                      className={`w-full p-4 rounded-xl text-left transition-all border outline-none flex items-center justify-between active:scale-[0.99] cursor-pointer min-h-[50px] group focus:ring-2 focus:ring-blue-600 focus:ring-offset-1 ${
-                        isSelected
-                          ? 'border-blue-600 bg-blue-50/10 text-blue-900 font-bold shadow-sm shadow-blue-50/15'
-                          : isError
-                            ? 'border-rose-300 bg-rose-50/10 text-slate-700 hover:border-rose-400'
-                            : 'border-slate-200/90 bg-white text-slate-700 hover:border-slate-350 hover:bg-slate-50/30 font-medium'
-                      }`}
-                    >
-                      <span className="text-xs sm:text-sm leading-relaxed pr-3 group-hover:text-slate-900 transition-colors">{opt.label}</span>
-                      <span className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all flex-shrink-0 ${
-                        isSelected
-                          ? 'border-blue-600 bg-blue-600 text-white scale-110'
-                          : 'border-slate-300 bg-white group-hover:border-slate-450'
-                      }`}>
-                        <AnimatePresence>
-                          {isSelected && (
-                            <motion.span
-                              initial={{ scale: 0 }}
-                              animate={{ scale: 1 }}
-                              exit={{ scale: 0 }}
-                              transition={{ type: "spring", stiffness: 400, damping: 12 }}
-                              className="flex items-center justify-center"
-                            >
-                              <Check size={11} strokeWidth={4.5} />
-                            </motion.span>
-                          )}
-                        </AnimatePresence>
-                      </span>
-                    </motion.button>
-                  );
-                })}
-              </div>
-              {renderInlineConfirm('consultation_interest')}
-              {validationTriggered && errors.consultation_interest && (
-                <div className="text-rose-600 text-xs font-bold leading-none mt-1.5 flex items-center gap-1.5 animate-fade-in" role="alert">
-                  <AlertCircle size={13} className="flex-shrink-0" />
-                  <span>{errors.consultation_interest}</span>
-                </div>
-              )}
             </div>
 
             {/* PREFERRED CONTACT TIME */}

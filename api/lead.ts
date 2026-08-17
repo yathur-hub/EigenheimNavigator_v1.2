@@ -95,9 +95,6 @@ export default async function handler(
   if (!financial_situation.own_funds_range) {
     return res.status(400).json({ error: 'Angabe zum Eigenkapital ist ein Pflichtfeld.' });
   }
-  if (!financial_situation.financing_status) {
-    return res.status(400).json({ error: 'Angabe zum Finanzierungsstatus ist ein Pflichtfeld.' });
-  }
   if (!regional_profile.canton) {
     return res.status(400).json({ error: 'Angabe zum aktuellen Kanton ist ein Pflichtfeld.' });
   }
@@ -109,9 +106,6 @@ export default async function handler(
   }
   if (!regional_profile.current_situation) {
     return res.status(400).json({ error: 'Angabe zur aktuellen Wohnsituation ist ein Pflichtfeld.' });
-  }
-  if (!consultation.consultation_interest) {
-    return res.status(400).json({ error: 'Information über Beratungsinteresse ist ein Pflichtfeld.' });
   }
   const contactPreference = consultation.contact_preference || 'phone';
   if (!contactPreference) {
@@ -318,12 +312,16 @@ function translatePreferredRegion(val: any): any {
 
 function translateAgeRange(val: string): string {
   const map: Record<string, string> = {
+    '22_28': '22 bis 28 Jahre',
+    '28_35': '28 bis 35 Jahre',
+    '35_45': '35 bis 45 Jahre',
+    '45_55': '45 bis 55 Jahre',
+    '55_plus': '55+ Jahre',
     'under_25': 'Unter 25 Jahre',
     '25_27': '25 bis 27 Jahre',
     '28_34': '28 bis 34 Jahre',
     '35_44': '35 bis 44 Jahre',
-    '45_54': '45 bis 54 Jahre',
-    '55_plus': 'Über 55 Jahre'
+    '45_54': '45 bis 54 Jahre'
   };
   return map[val] || val;
 }
