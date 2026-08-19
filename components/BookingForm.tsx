@@ -506,8 +506,20 @@ const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onClose, title, su
 
     const currentQ = MOBILE_QUESTIONS[mobileQuestionIndex];
     const nextQ = MOBILE_QUESTIONS[nextIndex];
-    
+
+    if (currentQ && currentQ.type !== 'final_submit') {
+      track('wizard_question_answered', {
+        step_number: currentQ.step,
+        category: currentQ.category,
+        field_key: currentQ.fieldKey,
+        question_title: currentQ.title
+      });
+    }
+
     if (nextQ && currentQ && currentQ.category !== nextQ.category) {
+      // Mirrors the desktop `form_step${step}_complete` event (fired in handleNext),
+      // which the mobile one-question-per-screen flow otherwise never triggers.
+      track(`form_step${currentQ.step}_complete`, { formDataStep: formData });
       setInterstitial({
         completedCategory: currentQ.category,
         nextCategory: nextQ.category,
@@ -1071,6 +1083,17 @@ const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onClose, title, su
 
     setErrors(stepErrors);
 
+    MOBILE_QUESTIONS
+      .filter((q) => q.step === step && q.type !== 'final_submit')
+      .forEach((q) => {
+        track(stepErrors[q.fieldKey] ? 'wizard_question_skipped' : 'wizard_question_answered', {
+          step_number: step,
+          category: q.category,
+          field_key: q.fieldKey,
+          question_title: q.title
+        });
+      });
+
     if (Object.keys(stepErrors).length === 0) {
       track(`form_step${step}_complete`, { formDataStep: formData });
       
@@ -1126,6 +1149,17 @@ const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onClose, title, su
     } else {
       const step4Errors = validateStep4(formData);
       setErrors(step4Errors);
+
+      MOBILE_QUESTIONS
+        .filter((q) => q.step === 4 && q.type !== 'final_submit')
+        .forEach((q) => {
+          track(step4Errors[q.fieldKey] ? 'wizard_question_skipped' : 'wizard_question_answered', {
+            step_number: 4,
+            category: q.category,
+            field_key: q.fieldKey,
+            question_title: q.title
+          });
+        });
 
       if (Object.keys(step4Errors).length > 0) {
         console.warn("Validation failed for step 4", step4Errors);
@@ -1550,6 +1584,12 @@ const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onClose, title, su
     const currentQ = MOBILE_QUESTIONS[mobileQuestionIndex];
     const errorText = currentQ.validate(formData);
     if (errorText) {
+      track('wizard_question_skipped', {
+        step_number: currentQ.step,
+        category: currentQ.category,
+        field_key: currentQ.fieldKey,
+        question_title: currentQ.title
+      });
       setErrors({ [currentQ.fieldKey]: errorText });
       setValidationTriggered(true);
       return;
