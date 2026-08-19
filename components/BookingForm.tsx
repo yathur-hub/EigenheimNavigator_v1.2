@@ -1083,22 +1083,16 @@ const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onClose, title, su
 
     setErrors(stepErrors);
 
-    // 150ms Versatz pro Frage: GA4/gtag verwirft mehrere Hits desselben
-    // Event-Namens, die synchron im selben Tick gepusht werden (beobachtet:
-    // von 3 synchronen wizard_question_answered-Pushes kam keiner an, mit
-    // Versatz alle drei zuverlässig).
-    MOBILE_QUESTIONS
-      .filter((q) => q.step === step && q.type !== 'final_submit')
-      .forEach((q, i) => {
-        setTimeout(() => {
-          track(stepErrors[q.fieldKey] ? 'wizard_question_skipped' : 'wizard_question_answered', {
-            step_number: step,
-            category: q.category,
-            field_key: q.fieldKey,
-            question_title: q.title
-          });
-        }, i * 150);
-      });
+    // Bewusst KEIN Frage-Level-Tracking hier: GA4/gtag verwirft zuverlässig
+    // mehrere Hits desselben Event-Namens, die im selben Tick (oder auch mit
+    // Versatz bis 2.5s) gepusht werden - live gegen die Seite verifiziert,
+    // von 3 wizard_question_answered-Pushes kam wiederholt keiner an. Der
+    // Desktop-Flow zeigt ohnehin alle Fragen eines Schritts gleichzeitig,
+    // "wo genau ist der Nutzer ausgestiegen" ist hier auf Schritt-Ebene
+    // beantwortet (form_step${step}_complete unten), nicht auf Frage-Ebene
+    // sinnvoll. Frage-Level-Granularität bleibt exklusiv dem Mobile-Flow
+    // vorbehalten (transitionToNextMobileQuestion), der ohnehin nur ein
+    // Event pro echtem Klick sendet und daher nie dieses Problem hat.
 
     if (Object.keys(stepErrors).length === 0) {
       track(`form_step${step}_complete`, { formDataStep: formData });
@@ -1156,20 +1150,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onClose, title, su
       const step4Errors = validateStep4(formData);
       setErrors(step4Errors);
 
-      // Versatz siehe handleNext oben - selbe GA4/gtag-Einschränkung bei
-      // mehreren synchronen Hits desselben Event-Namens.
-      MOBILE_QUESTIONS
-        .filter((q) => q.step === 4 && q.type !== 'final_submit')
-        .forEach((q, i) => {
-          setTimeout(() => {
-            track(step4Errors[q.fieldKey] ? 'wizard_question_skipped' : 'wizard_question_answered', {
-              step_number: 4,
-              category: q.category,
-              field_key: q.fieldKey,
-              question_title: q.title
-            });
-          }, i * 150);
-        });
+      // Bewusst kein Frage-Level-Tracking hier, siehe handleNext oben.
 
       if (Object.keys(step4Errors).length > 0) {
         console.warn("Validation failed for step 4", step4Errors);
