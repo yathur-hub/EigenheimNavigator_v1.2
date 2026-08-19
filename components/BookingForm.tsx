@@ -1083,15 +1083,21 @@ const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onClose, title, su
 
     setErrors(stepErrors);
 
+    // 150ms Versatz pro Frage: GA4/gtag verwirft mehrere Hits desselben
+    // Event-Namens, die synchron im selben Tick gepusht werden (beobachtet:
+    // von 3 synchronen wizard_question_answered-Pushes kam keiner an, mit
+    // Versatz alle drei zuverlässig).
     MOBILE_QUESTIONS
       .filter((q) => q.step === step && q.type !== 'final_submit')
-      .forEach((q) => {
-        track(stepErrors[q.fieldKey] ? 'wizard_question_skipped' : 'wizard_question_answered', {
-          step_number: step,
-          category: q.category,
-          field_key: q.fieldKey,
-          question_title: q.title
-        });
+      .forEach((q, i) => {
+        setTimeout(() => {
+          track(stepErrors[q.fieldKey] ? 'wizard_question_skipped' : 'wizard_question_answered', {
+            step_number: step,
+            category: q.category,
+            field_key: q.fieldKey,
+            question_title: q.title
+          });
+        }, i * 150);
       });
 
     if (Object.keys(stepErrors).length === 0) {
@@ -1150,15 +1156,19 @@ const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onClose, title, su
       const step4Errors = validateStep4(formData);
       setErrors(step4Errors);
 
+      // Versatz siehe handleNext oben - selbe GA4/gtag-Einschränkung bei
+      // mehreren synchronen Hits desselben Event-Namens.
       MOBILE_QUESTIONS
         .filter((q) => q.step === 4 && q.type !== 'final_submit')
-        .forEach((q) => {
-          track(step4Errors[q.fieldKey] ? 'wizard_question_skipped' : 'wizard_question_answered', {
-            step_number: 4,
-            category: q.category,
-            field_key: q.fieldKey,
-            question_title: q.title
-          });
+        .forEach((q, i) => {
+          setTimeout(() => {
+            track(step4Errors[q.fieldKey] ? 'wizard_question_skipped' : 'wizard_question_answered', {
+              step_number: 4,
+              category: q.category,
+              field_key: q.fieldKey,
+              question_title: q.title
+            });
+          }, i * 150);
         });
 
       if (Object.keys(step4Errors).length > 0) {
