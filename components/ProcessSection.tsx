@@ -2,7 +2,7 @@
 import React from 'react';
 
 interface ProcessSectionProps {
-  onStartCheck: () => void;
+  onStartCheck: (ctaLocation?: string, ctaText?: string) => void;
 }
 
 const ProcessSection: React.FC<ProcessSectionProps> = ({ onStartCheck }) => {
@@ -50,9 +50,9 @@ const ProcessSection: React.FC<ProcessSectionProps> = ({ onStartCheck }) => {
           <button 
             className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 sm:py-4.5 rounded-2xl font-black text-center text-sm sm:text-base shadow-xl transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
             data-event="cta_primary_process_click"
-            onClick={onStartCheck}
+            onClick={() => onStartCheck('process', 'Realitätscheck starten')}
           >
-            Erstgespräch sichern
+            Realitätscheck starten
           </button>
           <div className="inline-flex items-center gap-2 bg-rose-50 border border-rose-200 text-rose-700 px-4 py-2 rounded-xl text-xs font-semibold shadow-sm">
             <svg className="w-3.5 h-3.5 text-rose-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">

@@ -10,8 +10,8 @@ const Footer: React.FC = () => {
         <div className="flex flex-col sm:flex-row justify-between gap-10 sm:gap-12 mb-12 sm:mb-16">
           <div className="space-y-6 max-w-md">
             <Link to="/" className="inline-block">
-              <img 
-                src="https://raw.githubusercontent.com/yathur-hub/EHN-Brandassets/main/EHN-Original.png" 
+              <img loading="lazy" decoding="async" 
+                src="/img/logo-ehn.webp" 
                 alt="Eigenheim Navigator Logo" 
                 className="h-16 md:h-20 w-auto object-contain brightness-0 invert"
                 referrerPolicy="no-referrer"

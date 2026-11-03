@@ -2,17 +2,17 @@
 import React from 'react';
 
 interface PartnerSectionProps {
-  onStartCheck: () => void;
+  onStartCheck: (ctaLocation?: string, ctaText?: string) => void;
 }
 
 const clientImages = [
-  "https://raw.githubusercontent.com/yathur-hub/EigenheimNavi-BrandAssets/main/Buob-Familie.jpg",
-  "https://raw.githubusercontent.com/yathur-hub/EigenheimNavi-BrandAssets/main/Frischknech%201.jpg",
-  "https://raw.githubusercontent.com/yathur-hub/EigenheimNavi-BrandAssets/main/Gro%CC%88nemeyer%201.jpg",
-  "https://raw.githubusercontent.com/yathur-hub/EigenheimNavi-BrandAssets/main/Gru%CC%88ndig%20&%20Stillhart.JPG",
-  "https://raw.githubusercontent.com/yathur-hub/EigenheimNavi-BrandAssets/main/Niru%26Adsaya-3.jpg",
-  "https://raw.githubusercontent.com/yathur-hub/EigenheimNavi-BrandAssets/main/Peter%20Anna%20%26%20Ru%CC%88egg%20Luca%201.jpeg",
-  "https://raw.githubusercontent.com/yathur-hub/EigenheimNavi-BrandAssets/main/Ponik%20Familie.jpg"
+  "/img/kunde-buob.webp",
+  "/img/kunde-frischknecht.webp",
+  "/img/kunde-groenemeyer.webp",
+  "/img/kunde-gruendig-stillhart.webp",
+  "/img/kunde-niru-adsaya.webp",
+  "/img/kunde-peter-ruegg.webp",
+  "/img/kunde-ponik.webp"
 ];
 
 const PartnerSection: React.FC<PartnerSectionProps> = ({ onStartCheck }) => {
@@ -56,9 +56,9 @@ const PartnerSection: React.FC<PartnerSectionProps> = ({ onStartCheck }) => {
           <button 
             className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 sm:py-4.5 rounded-2xl font-black text-center text-sm sm:text-base shadow-xl transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
             data-event="cta_primary_gallery_click"
-            onClick={onStartCheck}
+            onClick={() => onStartCheck('gallery', 'Realitätscheck starten')}
           >
-            Den Weg zum Eigenheim starten
+            Realitätscheck starten
           </button>
         </div>
       </div>

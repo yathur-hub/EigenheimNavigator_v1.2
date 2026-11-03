@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 
 interface FAQSectionProps {
-  onStartCheck: () => void;
+  onStartCheck: (ctaLocation?: string, ctaText?: string) => void;
 }
 
 const FAQSection: React.FC<FAQSectionProps> = ({ onStartCheck }) => {
@@ -78,7 +78,7 @@ const FAQSection: React.FC<FAQSectionProps> = ({ onStartCheck }) => {
                   <button 
                     className="text-[#F87101] font-bold text-sm hover:underline"
                     data-event="faq_cta_click"
-                    onClick={onStartCheck}
+                    onClick={() => onStartCheck('faq', faq.cta)}
                   >
                     {faq.cta} &rarr;
                   </button>

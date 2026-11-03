@@ -3,7 +3,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 
 interface HeaderProps {
-  onStartCheck: () => void;
+  onStartCheck: (ctaLocation?: string, ctaText?: string) => void;
 }
 
 const Header: React.FC<HeaderProps> = ({ onStartCheck }) => {
@@ -14,21 +14,21 @@ const Header: React.FC<HeaderProps> = ({ onStartCheck }) => {
         <div className="flex items-center">
           <Link to="/" className="flex items-center gap-2.5">
             <img 
-              src="https://raw.githubusercontent.com/yathur-hub/EHN-Brandassets/main/EHN-Original.png" 
-              alt="Eigenheim Navigator Logo" 
+              src="/img/logo-ehn.webp" width={480} height={270} fetchPriority="high" 
+              alt="EigenheimNavi Logo" 
               className="h-12 md:h-16 w-auto object-contain"
               referrerPolicy="no-referrer"
             />
           </Link>
         </div>
 
-        {/* Desktop CTA */}
-        <div className="hidden md:flex items-center space-x-8">
+        {/* CTA (mobile + desktop) */}
+        <div className="flex items-center">
           <button 
-            className="bg-blue-600 text-white px-7 py-3 rounded-[16px] font-black text-sm shadow-lg shadow-blue-100 hover:bg-blue-700 transition-all active:scale-95"
-            onClick={onStartCheck}
+            className="bg-blue-600 text-white px-4 py-2.5 md:px-7 md:py-3 rounded-xl md:rounded-[16px] font-black text-xs md:text-sm shadow-lg shadow-blue-100 hover:bg-blue-700 transition-all active:scale-95 whitespace-nowrap"
+            onClick={() => onStartCheck('header', 'Realitätscheck starten')}
           >
-            Erstgespräch buchen
+            Realitätscheck starten
           </button>
         </div>
       </div>

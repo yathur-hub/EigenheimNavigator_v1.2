@@ -1,9 +1,10 @@
 
+import YouTubeFacade from './YouTubeFacade';
 import React, { useRef, useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 
 interface SocialProofSectionProps {
-  onStartCheck: () => void;
+  onStartCheck: (ctaLocation?: string, ctaText?: string) => void;
 }
 
 const SocialProofSection: React.FC<SocialProofSectionProps> = ({ onStartCheck }) => {
@@ -119,14 +120,7 @@ const SocialProofSection: React.FC<SocialProofSectionProps> = ({ onStartCheck })
             >
               <div className="aspect-video bg-slate-100 rounded-[20px] sm:rounded-[24px] mb-6 sm:mb-8 overflow-hidden shadow-inner relative group">
                 {t.videoId ? (
-                  <iframe
-                    className="absolute inset-0 w-full h-full"
-                    src={`https://www.youtube.com/embed/${t.videoId}?rel=0`}
-                    title={`Kundenstory ${t.name}`}
-                    frameBorder="0"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                  ></iframe>
+                  <YouTubeFacade videoId={t.videoId} title={`Kundenstory ${t.name}`} />
                 ) : (
                   <div className="w-full h-full flex flex-col items-center justify-center cursor-pointer group hover:bg-slate-200 transition-colors" data-event="video_placeholder_click">
                     <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-md group-hover:scale-110 transition-transform">
@@ -152,9 +146,9 @@ const SocialProofSection: React.FC<SocialProofSectionProps> = ({ onStartCheck })
         <div className="mt-12 flex flex-col items-center justify-center gap-4">
            <button 
             className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 sm:py-4.5 rounded-2xl font-black text-center text-sm sm:text-base shadow-xl transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
-            onClick={onStartCheck}
+            onClick={() => onStartCheck('testimonials', 'Realitätscheck starten')}
           >
-            Erstgespräch buchen
+            Realitätscheck starten
           </button>
           <div className="inline-flex items-center gap-2 bg-rose-50 border border-rose-200 text-rose-700 px-4 py-2 rounded-xl text-xs font-semibold shadow-sm">
             <svg className="w-3.5 h-3.5 text-rose-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
