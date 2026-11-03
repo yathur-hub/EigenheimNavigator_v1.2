@@ -1,18 +1,19 @@
 
+import YouTubeFacade from './YouTubeFacade';
 import React from 'react';
 
 interface HeroProps {
-  onStartCheck: () => void;
+  onStartCheck: (ctaLocation?: string, ctaText?: string) => void;
 }
 
 const Hero: React.FC<HeroProps> = ({ onStartCheck }) => {
   return (
-    <section className="relative bg-white pt-10 pb-10 md:pt-24 md:pb-12 px-4 overflow-hidden border-b border-slate-50">
+    <section className="relative bg-white pt-8 pb-10 md:pt-24 md:pb-12 px-4 overflow-hidden border-b border-slate-50">
       <div className="max-w-7xl mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
           
           {/* Left Column: Copy */}
-          <div className="space-y-8 animate-fade-in order-2 lg:order-1">
+          <div className="space-y-8 animate-fade-in order-1">
             <div className="space-y-4">
               <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-[54px] font-extrabold text-slate-900 leading-[1.05] tracking-tight">
                 Finde heraus, ob dein Eigenheim realistisch ist.
@@ -27,7 +28,7 @@ const Hero: React.FC<HeroProps> = ({ onStartCheck }) => {
                 <button 
                   className="w-full sm:w-auto bg-blue-600 text-white px-6 sm:px-8 py-4 sm:py-4.5 rounded-2xl font-black text-center text-sm sm:text-base shadow-xl shadow-blue-200 hover:bg-blue-700 transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
                   data-event="check_start"
-                  onClick={onStartCheck}
+                  onClick={() => onStartCheck('hero', 'Kostenlosen Realitätscheck starten')}
                 >
                   Kostenlosen Realitätscheck starten
                 </button>
@@ -68,13 +69,13 @@ const Hero: React.FC<HeroProps> = ({ onStartCheck }) => {
               <div className="flex items-center gap-4">
                  <div className="flex -space-x-3">
                    {[
-                     "https://raw.githubusercontent.com/yathur-hub/EigenheimNavi-BrandAssets/main/Buob-Familie.jpg",
-                     "https://raw.githubusercontent.com/yathur-hub/EigenheimNavi-BrandAssets/main/Malnder%20Michael.jpg",
-                     "https://raw.githubusercontent.com/yathur-hub/EigenheimNavi-BrandAssets/main/Tushi%20(1).jpeg",
-                     "https://raw.githubusercontent.com/yathur-hub/EigenheimNavi-BrandAssets/main/X_Lechmann%20Marco%20%26%20Melnaie1.jpg"
+                     "/img/avatar-buob.webp",
+                     "/img/avatar-malnder.webp",
+                     "/img/avatar-tushi.webp",
+                     "/img/avatar-lechmann.webp"
                    ].map((src, i) => (
                      <div key={i} className="w-10 h-10 rounded-full border-2 border-white bg-slate-100 overflow-hidden">
-                       <img src={src} alt="user" className="w-full h-full object-cover" />
+                       <img loading="lazy" decoding="async" src={src} alt="user" className="w-full h-full object-cover" />
                      </div>
                    ))}
                  </div>
@@ -94,25 +95,18 @@ const Hero: React.FC<HeroProps> = ({ onStartCheck }) => {
                     <svg key={i} className="w-4 h-4 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
                   ))}
                 </div>
-                <span className="text-slate-900 uppercase">4.9 Sterne</span>
+                <span className="text-slate-900 uppercase whitespace-nowrap">4.9 Sterne</span>
                 <span className="text-slate-400 font-medium whitespace-nowrap">45 Google-Bewertungen</span>
               </a>
             </div>
           </div>
 
           {/* Right Column: VSL Video */}
-          <div className="relative order-1 lg:order-2">
+          <div className="relative order-2">
             <div 
               className="relative aspect-video overflow-hidden rounded-[32px] shadow-2xl border border-slate-100 transition-all hover:shadow-blue-200/40 group bg-slate-100"
             >
-              <iframe
-                className="absolute inset-0 w-full h-full"
-                src="https://www.youtube.com/embed/vVioptejOHM?rel=0"
-                title="Eigenheim Navigator Video"
-                frameBorder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              ></iframe>
+              <YouTubeFacade videoId="vVioptejOHM" title="Eigenheim finanzieren: Wo steht ihr wirklich?" />
             </div>
             
             {/* Decoration */}

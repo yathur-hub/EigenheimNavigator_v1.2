@@ -2,7 +2,7 @@ import React from 'react';
 import { ShieldCheck, MapPin, CheckCircle, Info, Landmark, HelpCircle, HeartHandshake } from 'lucide-react';
 
 interface TrustSectionProps {
-  onStartCheck: () => void;
+  onStartCheck: (ctaLocation?: string, ctaText?: string) => void;
 }
 
 const TrustSection: React.FC<TrustSectionProps> = ({ onStartCheck }) => {

@@ -2,22 +2,22 @@
 import React from 'react';
 
 interface SolutionSectionProps {
-  onStartCheck: () => void;
+  onStartCheck: (ctaLocation?: string, ctaText?: string) => void;
 }
 
 const SolutionSection: React.FC<SolutionSectionProps> = ({ onStartCheck }) => {
   const outcomes = [
     {
-      title: "Klarheit über eure echte Ausgangslage",
-      text: "Ihr wisst genau, was drinliegt, wo eure Grenzen sind und was ihr verbessern könnt. Das gibt euch Sicherheit, bevor ihr euch in ein Objekt verliebt oder unnötig Zeit mit falschen Immobilien verliert."
+      title: "Klarheit über deine echte Ausgangslage",
+      text: "Du weisst genau, was drinliegt, wo deine Grenzen sind und was du verbessern kannst. Das gibt dir Sicherheit, bevor du dich in ein Objekt verliebst oder unnötig Zeit mit falschen Immobilien verlierst."
     },
     {
       title: "Sicher begleitet durch den Kaufprozess",
-      text: "Ihr habt jemanden an eurer Seite, der den Weg kennt. Von der Besichtigung bis zum Kaufvertrag erkennt ihr Stolperfallen früher, verhandelt besser vorbereitet und trefft Entscheidungen mit deutlich mehr Ruhe."
+      text: "Du hast jemanden an deiner Seite, der den Weg kennt. Von der Besichtigung bis zum Kaufvertrag erkennst du Stolperfallen früher, verhandelst besser vorbereitet und triffst Entscheidungen mit deutlich mehr Ruhe."
     },
     {
       title: "Ein Plan, der auch nach dem Kauf hält",
-      text: "Euer Eigenheim soll nicht nur gekauft, sondern auch sorgenfrei getragen werden können. Deshalb planen wir mit euch auch die Zeit nach dem Einzug: Budget, Unterhalt, Renovationen, Absicherung, Vorsorge und Steuern."
+      text: "Dein Eigenheim soll nicht nur gekauft, sondern auch sorgenfrei getragen werden können. Deshalb planen wir mit dir auch die Zeit nach dem Einzug: Budget, Unterhalt, Renovationen, Absicherung, Vorsorge und Steuern."
     }
   ];
 
@@ -40,9 +40,9 @@ const SolutionSection: React.FC<SolutionSectionProps> = ({ onStartCheck }) => {
               <button 
                 className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 sm:py-4.5 rounded-2xl font-black text-center text-sm sm:text-base shadow-xl transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
                 data-event="cta_primary_click"
-                onClick={onStartCheck}
+                onClick={() => onStartCheck('solution', 'Realitätscheck starten')}
               >
-                Erstgespräch buchen
+                Realitätscheck starten
               </button>
               <div className="inline-flex items-center gap-2 bg-rose-50 border border-rose-200 text-rose-700 px-4 py-2 rounded-xl text-xs font-semibold shadow-sm">
                 <svg className="w-3.5 h-3.5 text-rose-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">

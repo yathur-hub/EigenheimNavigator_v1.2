@@ -127,17 +127,20 @@ const CookieConsent: React.FC = () => {
   if (!isVisible) return null;
 
   return (
-    <div id="cookie-consent-overlay" className="fixed bottom-0 left-0 right-0 p-4 sm:p-6 z-[999] flex justify-center items-end animate-fade-in pointer-events-none">
-      <div className="w-full max-w-2xl bg-white border border-slate-100 rounded-3xl p-5 sm:p-6 shadow-2xl shadow-slate-900/10 pointer-events-auto flex flex-col md:flex-row md:items-center gap-5 justify-between">
-        <div className="flex-1 space-y-4">
-          <div className="flex items-center gap-3">
+    <div id="cookie-consent-overlay" className="fixed bottom-0 left-0 right-0 p-2 sm:p-6 z-[999] flex justify-center items-end animate-fade-in pointer-events-none">
+      <div className="w-full max-w-2xl bg-white border border-slate-100 rounded-2xl sm:rounded-3xl p-3.5 sm:p-6 shadow-2xl shadow-slate-900/10 pointer-events-auto flex flex-col md:flex-row md:items-center gap-3 sm:gap-5 justify-between max-h-[85vh] overflow-y-auto">
+        <div className="flex-1 space-y-2 sm:space-y-4">
+          <div className="hidden sm:flex items-center gap-3">
             <div className="w-9 h-9 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center">
               <Shield size={20} />
             </div>
             <h4 className="text-sm font-black text-slate-900 uppercase tracking-widest">Cookie-Einstellungen</h4>
           </div>
           
-          <p className="text-xs sm:text-sm text-slate-500 font-medium leading-relaxed">
+          <p className="sm:hidden text-xs text-slate-600 font-medium leading-snug">
+            Wir nutzen Cookies für Statistik und Werbung. Du kannst zustimmen oder ablehnen.
+          </p>
+          <p className="hidden sm:block text-sm text-slate-500 font-medium leading-relaxed">
             Wir verwenden Cookies und ähnliche Technologien, um unsere Website zu analysieren und Marketingmassnahmen zu optimieren. Du kannst alle akzeptieren oder nicht notwendige Cookies ablehnen.
           </p>
 
@@ -200,7 +203,7 @@ const CookieConsent: React.FC = () => {
           )}
         </div>
 
-        <div className="flex flex-col gap-2 min-w-[180px] sm:justify-end">
+        <div className="flex flex-col gap-2 md:min-w-[180px] sm:justify-end">
           {showPreferences ? (
             <>
               <button 
@@ -218,21 +221,23 @@ const CookieConsent: React.FC = () => {
             </>
           ) : (
             <>
-              <button 
-                onClick={handleAcceptAll}
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-black text-xs py-3.5 px-4 rounded-xl shadow-lg shadow-blue-100 transition-all text-center"
-              >
-                Alle akzeptieren
-              </button>
-              <button 
-                onClick={handleDenyAll}
-                className="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-black text-xs py-3.5 px-4 rounded-xl transition-all text-center"
-              >
-                Ablehnen
-              </button>
+              <div className="grid grid-cols-2 md:grid-cols-1 gap-2">
+                <button 
+                  onClick={handleDenyAll}
+                  className="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-black text-xs py-3 sm:py-3.5 px-4 rounded-xl transition-all text-center md:order-2"
+                >
+                  Ablehnen
+                </button>
+                <button 
+                  onClick={handleAcceptAll}
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-black text-xs py-3 sm:py-3.5 px-4 rounded-xl shadow-lg shadow-blue-100 transition-all text-center md:order-1"
+                >
+                  Alle akzeptieren
+                </button>
+              </div>
               <button 
                 onClick={() => setShowPreferences(true)}
-                className="w-full border-2 border-slate-100 hover:border-slate-200 text-slate-500 hover:text-slate-700 font-black text-xs py-3 px-4 rounded-xl transition-all text-center flex items-center justify-center gap-1.5"
+                className="w-full md:border-2 border-slate-100 hover:border-slate-200 text-slate-500 hover:text-slate-700 font-black text-[11px] sm:text-xs py-1.5 md:py-3 px-4 rounded-xl transition-all text-center flex items-center justify-center gap-1.5"
               >
                 <Settings size={14} />
                 Auswahl anpassen

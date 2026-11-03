@@ -2,7 +2,7 @@ import React from 'react';
 import { Users, CheckCircle2, AlertCircle, MapPin, Briefcase, Coins, HelpCircle, Compass, Info } from 'lucide-react';
 
 interface TargetGroupSectionProps {
-  onStartCheck: () => void;
+  onStartCheck: (ctaLocation?: string, ctaText?: string) => void;
 }
 
 const TargetGroupSection: React.FC<TargetGroupSectionProps> = ({ onStartCheck }) => {
@@ -104,7 +104,7 @@ const TargetGroupSection: React.FC<TargetGroupSectionProps> = ({ onStartCheck })
               <ul className="space-y-2 pl-1">
                 {[
                   "wenn du eine Renditeliegenschaft oder ein Anlageobjekt suchst",
-                  "wenn du deutlich unter 22 oder über 45 Jahre alt bist",
+                  "wenn du jünger als 22 oder älter als 48 Jahre bist",
                   "wenn eine Beratung auf Deutsch für dich aktuell nicht gut möglich ist",
                   "wenn du erst seit kurzer Zeit selbstständig bist und noch keine stabile Einkommenshistorie vorweisen kannst",
                   "wenn du beruflich selbst im Finanzierungs-, Versicherungs- oder Hypothekarbereich tätig bist",
@@ -126,9 +126,9 @@ const TargetGroupSection: React.FC<TargetGroupSectionProps> = ({ onStartCheck })
             <button 
               type="button"
               className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 sm:py-4.5 rounded-2xl font-black text-center text-sm sm:text-base shadow-xl transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
-              onClick={onStartCheck}
+              onClick={() => onStartCheck('target_group', 'Realitätscheck starten')}
             >
-              Meine Ausgangslage prüfen
+              Realitätscheck starten
             </button>
             
             <div className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-500">

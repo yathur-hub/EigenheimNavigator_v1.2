@@ -155,7 +155,7 @@ const FINANCING_STATUS_OPTIONS = [
 const HOUSEHOLD_INCOME_OPTIONS = [
   { value: 'under_6000', label: 'Unter CHF 6’000', score: -10 },
   { value: '6000_8999', label: 'CHF 6’000–8’999', score: 10 },
-  { value: '9000_11999', label: 'CHF 9’050–11’999', score: 20 },
+  { value: '9000_11999', label: 'CHF 9’000–11’999', score: 20 },
   { value: '12000_15999', label: 'CHF 12’000–15’999', score: 25 },
   { value: '16000_plus', label: 'CHF 16’000+', score: 25 },
   { value: 'prefer_not_to_say', label: 'Möchte ich nicht angeben', score: 0 }
@@ -305,7 +305,7 @@ const REACTION_MAPPING: Record<string, Record<string, string>> = {
     "28_35": "Der perfekte Lebensabschnitt für den ersten Schritt ins Eigenheim.",
     "35_45": "Beste Lebensphase, um Wohnträume langfristig zu verwirklichen.",
     "45_55": "Lebenserfahren. Wir richten die Finanzierung optimal aus.",
-    "55_plus": "Vorausschauend. Wir planen die passende Wohnlösung für euch."
+    "55_plus": "Vorausschauend. Wir planen die passende Wohnlösung für dich."
   },
   current_situation: {
     renting: "Mietverhältnis — der klassische Ausgangspunkt fürs Wohneigentum.",
@@ -345,7 +345,7 @@ const REACTION_MAPPING: Record<string, Record<string, string>> = {
 
 const SCHEDULER_LINK = "https://calendly.com/";
 
-const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onClose, title, subtitle, variant = 'inline', onProgressUpdate }) => {
+const BookingFormInner: React.FC<BookingFormProps> = ({ onSuccess, onClose, title, subtitle, variant = 'inline', onProgressUpdate }) => {
   const [confirmations, setConfirmations] = useState<Record<string, { text: string; id: string }>>({});
   const debounceTimersRef = useRef<Record<string, any>>({});
   const mobileAutoAdvanceTimerRef = useRef<any>(null);
@@ -519,7 +519,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onClose, title, su
     if (nextQ && currentQ && currentQ.category !== nextQ.category) {
       // Mirrors the desktop `form_step${step}_complete` event (fired in handleNext),
       // which the mobile one-question-per-screen flow otherwise never triggers.
-      track(`form_step${currentQ.step}_complete`, { formDataStep: formData });
+      track(`form_step${currentQ.step}_complete`, { step_number: currentQ.step, form_location: variant });
       setInterstitial({
         completedCategory: currentQ.category,
         nextCategory: nextQ.category,
@@ -721,9 +721,27 @@ const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onClose, title, su
     }
   };
 
+  // Funnel visibility events (A4). The inline form at the page bottom is mounted on page load,
+  // so its initial step is not reported; the modal reports from its first screen on.
+  const stepViewMountedRef = useRef(false);
+  const contactViewSentRef = useRef(false);
+  const STEP_NAMES: Record<number, string> = { 1: 'eigenheimwunsch', 2: 'finanzen', 3: 'region_situation', 4: 'kontaktdaten' };
   useEffect(() => {
-    track('form_started', { form_id: 'eigenheimnavi_lead_form_v1' });
-  }, []);
+    const isInitialInline = !stepViewMountedRef.current && variant !== 'modal';
+    stepViewMountedRef.current = true;
+    if (isInitialInline) return;
+    track('wizard_step_view', { step_number: step, step_name: STEP_NAMES[step], form_location: variant });
+    if (step === 4 && !contactViewSentRef.current) {
+      contactViewSentRef.current = true;
+      setTimeout(() => track('contact_step_view', { form_location: variant }), 300);
+    }
+  }, [step]);
+
+  const trackFormError = (stepNumber: number, errorMap: Record<string, string>) => {
+    const fields = Object.keys(errorMap);
+    if (fields.length === 0) return;
+    track('form_error', { step_number: stepNumber, error_fields: fields.join(','), error_count: fields.length, form_location: variant });
+  };
 
   // Validation routines per step matching Schweizer Hochdeutsch specs
   const validateStep1 = (data: FormState): Record<string, string> => {
@@ -1095,7 +1113,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onClose, title, su
     // Event pro echtem Klick sendet und daher nie dieses Problem hat.
 
     if (Object.keys(stepErrors).length === 0) {
-      track(`form_step${step}_complete`, { formDataStep: formData });
+      track(`form_step${step}_complete`, { step_number: step, form_location: variant });
       
       let loadingText = 'Daten werden analysiert...';
       if (step === 1) loadingText = 'Wohnwunsch-Faktoren werden ausgewertet...';
@@ -1115,6 +1133,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onClose, title, su
         setTimeout(scrollToTop, 50);
       }, 700);
     } else {
+      trackFormError(step, stepErrors);
       console.warn("Validation failed for step", step, stepErrors);
       setTimeout(() => {
         scrollToFirstError(stepErrors);
@@ -1141,6 +1160,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onClose, title, su
         const q = MOBILE_QUESTIONS[i];
         const err = q.validate(formData);
         if (err) {
+          trackFormError(q.step, { [q.fieldKey]: err });
           setMobileQuestionIndex(i);
           setErrors({ [q.fieldKey]: err });
           return;
@@ -1153,6 +1173,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onClose, title, su
       // Bewusst kein Frage-Level-Tracking hier, siehe handleNext oben.
 
       if (Object.keys(step4Errors).length > 0) {
+        trackFormError(4, step4Errors);
         console.warn("Validation failed for step 4", step4Errors);
         setTimeout(() => {
           scrollToFirstError(step4Errors);
@@ -1210,7 +1231,6 @@ const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onClose, title, su
     };
 
     try {
-      console.log("Sending Eigenheimnavi lead to webhook:", "https://mis13.app.n8n.cloud/webhook/7ff9cd84-6980-459a-8109-12799c07d4cb?t=957b1bbf705f3e384c3315842ea2be9c5eb5fe3f9680501a14de8cdb06e93b846a5d469f2c12e0b9a3fd6ad2b4c63e88a5993a267d11b5badd55c10002ffc2ba");
       const response = await fetch('/api/lead', {
         method: 'POST',
         headers: {
@@ -1442,7 +1462,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onClose, title, su
       id: 'age_range',
       category: 'Region & Situation',
       step: 3,
-      title: 'In welcher Altersgruppe seid ihr?',
+      title: 'In welcher Altersgruppe bist du?',
       type: 'single_select',
       fieldGroup: 'step_3_region_profile',
       fieldKey: 'age_range',
@@ -1583,6 +1603,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onClose, title, su
       });
       setErrors({ [currentQ.fieldKey]: errorText });
       setValidationTriggered(true);
+      setTimeout(() => trackFormError(currentQ.step, { [currentQ.fieldKey]: errorText }), 400);
       return;
     }
     setErrors({});
@@ -3088,7 +3109,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onClose, title, su
             {/* AGE RANGE OPTIONS */}
             <div className="space-y-3" data-field-key="age_range">
               <label id="age_range_label" className="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1 uppercase tracking-wider">
-                <span>In welcher Altersgruppe seid ihr?</span>
+                <span>In welcher Altersgruppe bist du?</span>
                 <span className="text-rose-500" aria-hidden="true">*</span>
               </label>
               
@@ -3522,7 +3543,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onClose, title, su
               {/* MINI TESTIMONIAL BANNER */}
               <div className="border-t border-slate-100 pt-3 flex gap-3.5 items-start">
                 <div className="w-9 h-9 rounded-full bg-slate-100 overflow-hidden flex-shrink-0 border border-slate-200">
-                  <img referrerPolicy="no-referrer" src="https://raw.githubusercontent.com/yathur-hub/EigenheimNavi-BrandAssets/main/Buob-Familie.jpg" alt="Familie Buob" className="w-full h-full object-cover" />
+                  <img loading="lazy" decoding="async" referrerPolicy="no-referrer" src="/img/avatar-buob.webp" alt="Familie Buob" className="w-full h-full object-cover" />
                 </div>
                 <div className="space-y-0.5">
                   <span className="text-[10px] font-extrabold text-slate-800 block">Familie Buob, Ostschweiz</span>
@@ -3536,6 +3557,26 @@ const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onClose, title, su
         )}
 
       </form>
+    </div>
+  );
+};
+
+/**
+ * Wrapper: reports form_started on the first real interaction (tap, click or key) instead of on mount.
+ * Before, form_started fired on every page load because the inline form is always mounted.
+ */
+const BookingForm: React.FC<BookingFormProps> = (props) => {
+  const startedRef = useRef(false);
+  const markStarted = () => {
+    if (startedRef.current) return;
+    startedRef.current = true;
+    const w = window as any;
+    w.dataLayer = w.dataLayer || [];
+    w.dataLayer.push({ event: 'form_started', form_id: 'eigenheimnavi_lead_form_v1', form_location: props.variant ?? 'inline' });
+  };
+  return (
+    <div style={{ display: 'contents' }} onPointerDownCapture={markStarted} onKeyDownCapture={markStarted}>
+      <BookingFormInner {...props} />
     </div>
   );
 };

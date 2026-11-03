@@ -8,7 +8,7 @@ interface VideoItem {
 }
 
 interface GlossarySectionProps {
-  onStartCheck: () => void;
+  onStartCheck: (ctaLocation?: string, ctaText?: string) => void;
 }
 
 const videos: VideoItem[] = [
@@ -749,7 +749,7 @@ const GlossarySection: React.FC<GlossarySectionProps> = ({ onStartCheck }) => {
             
             <div className="flex-shrink-0 w-full md:w-auto">
               <button
-                onClick={onStartCheck}
+                onClick={() => onStartCheck('glossary', 'Realitätscheck starten')}
                 className="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white font-black text-center text-sm sm:text-base py-4 py-4.5 px-8 rounded-2xl shadow-xl shadow-blue-950/20 transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
               >
                 Realitätscheck starten

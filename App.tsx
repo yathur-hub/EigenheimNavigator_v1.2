@@ -21,8 +21,17 @@ const App: React.FC = () => {
     console.log(`Tracking: ${event}`, data || '');
   };
 
-  const openModal = () => {
+  // Funnel events for GA4 via GTM (no personal data).
+  const pushEvent = (event: string, data: Record<string, unknown> = {}) => {
+    const w = window as any;
+    w.dataLayer = w.dataLayer || [];
+    w.dataLayer.push({ event, ...data });
+  };
+
+  const openModal = (ctaLocation: string = 'unknown', ctaText: string = '') => {
     track('modal_open');
+    pushEvent('cta_click', { cta_location: ctaLocation, cta_text: ctaText });
+    pushEvent('wizard_open', { trigger: ctaLocation, form_location: 'modal' });
     setIsModalOpen(true);
     setShowCloseConfirm(false);
     document.body.style.overflow = 'hidden';
@@ -145,7 +154,7 @@ const App: React.FC = () => {
             <div className="bg-slate-50 px-6 py-4 border-t border-slate-100 flex-shrink-0 text-center">
               <div className="flex items-center justify-center gap-2 mb-1">
                  <svg className="w-3 h-3 text-emerald-500" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 4.946-2.597 9.181-6.5 11.5a11.954 11.954 0 01-6.5-11.5c0-.68.056-1.35.166-2.001zm8.341 8.592a.75.75 0 00-1.014-1.074 3.25 3.25 0 01-4.493-4.493.75.75 0 00-1.074-1.014 4.75 4.75 0 006.581 6.581z" clipRule="evenodd" /></svg>
-                 <span className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">DSGVO Konform · SSL Verschlüsselt</span>
+                 <span className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Datenschutz nach Schweizer DSG · SSL-verschlüsselt</span>
               </div>
             </div>
           </div>

@@ -1,8 +1,9 @@
+import YouTubeFacade from './YouTubeFacade';
 import React from 'react';
 import { HelpCircle, Clock, AlertCircle } from 'lucide-react';
 
 interface ProblemSectionProps {
-  onStartCheck: () => void;
+  onStartCheck: (ctaLocation?: string, ctaText?: string) => void;
 }
 
 const ProblemSection: React.FC<ProblemSectionProps> = ({ onStartCheck }) => {
@@ -63,14 +64,7 @@ const ProblemSection: React.FC<ProblemSectionProps> = ({ onStartCheck }) => {
             <div className="bg-slate-50 p-4 rounded-[28px] border border-slate-100 shadow-xl overflow-hidden relative group">
               <div className="absolute inset-0 bg-gradient-to-tr from-blue-500/5 via-transparent to-transparent pointer-events-none" />
               <div className="aspect-video rounded-[20px] overflow-hidden bg-slate-900 border border-slate-200/50 relative">
-                <iframe 
-                  className="w-full h-full"
-                  src="https://www.youtube.com/embed/RQxJJReNv7I?rel=0" 
-                  title="Eigenheim Navigator Video" 
-                  frameBorder="0" 
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-                  allowFullScreen
-                ></iframe>
+                <YouTubeFacade videoId="RQxJJReNv7I" title="Die nackte Wahrheit über den Schweizer Eigenheimmarkt" />
               </div>
             </div>
             <p className="text-xs text-center text-slate-500 font-bold mt-2">

@@ -15,7 +15,7 @@ import ContactSection from '../../components/ContactSection';
 import Reveal from '../../components/Reveal';
 
 interface HomeProps {
-  onStartCheck: () => void;
+  onStartCheck: (ctaLocation?: string, ctaText?: string) => void;
 }
 
 const Home: React.FC<HomeProps> = ({ onStartCheck }) => {
